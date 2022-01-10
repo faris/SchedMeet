@@ -1,2 +1,2 @@
 # SchedMeet
-Metting Scheduler App
+Meeting Scheduler App
