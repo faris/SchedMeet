@@ -13,7 +13,7 @@ app.include_router(
 ENVIRONMENT = os.environ.get("ENVIRONMENT", "dev")
 
 origins = (
-    ["http://localhost:3000"] if ENVIRONMENT == "dev" else ["https://schedmeet.com"]
+    ["http://localhost:3000"] if ENVIRONMENT == "dev" else ["https://www.schedmeet.com"]
 )
 
 app.add_middleware(
