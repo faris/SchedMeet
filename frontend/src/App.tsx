@@ -1,8 +1,14 @@
 import React, { useEffect, useState } from 'react'
-import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth'
+import StyledFirebaseAuthOrigin from 'react-firebaseui/StyledFirebaseAuth'
 import firebase from 'firebase/compat/app'
 import 'firebase/compat/auth'
 import { LoggedIn } from './Components/LoggedIn'
+
+// https://github.com/vitejs/vite/issues/2139#issuecomment-854960323
+function interopDefault<T>(value: T): T {
+    return (value as any).default
+}
+const StyledFirebaseAuth = interopDefault(StyledFirebaseAuthOrigin)
 
 const firebaseConfig = {
     apiKey: 'AIzaSyBGo3J39Lyfai2wjVi_5MsTGDFmCcE7v34',

@@ -1,8 +1,6 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import firebase from 'firebase/compat/app'
-import { useEffect, useState } from 'react'
 import { testAuthPath } from '../constants'
-
 import axios from 'axios'
 
 export const LoggedIn = () => {
