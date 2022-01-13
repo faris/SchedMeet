@@ -1,45 +1,68 @@
-import { useState } from 'react'
-import logo from './logo.svg'
-import './App.css'
+import React, { useEffect, useState } from 'react'
+import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth'
+import firebase from 'firebase/compat/app'
+import 'firebase/compat/auth'
+import { LoggedIn } from './Components/LoggedIn'
+
+const firebaseConfig = {
+    apiKey: 'AIzaSyBGo3J39Lyfai2wjVi_5MsTGDFmCcE7v34',
+
+    authDomain: 'schedmeet.firebaseapp.com',
+
+    projectId: 'schedmeet',
+
+    storageBucket: 'schedmeet.appspot.com',
+
+    messagingSenderId: '395404504769',
+
+    appId: '1:395404504769:web:37f04cf38bd19772c36e40',
+}
+
+firebase.initializeApp(firebaseConfig)
+
+// Configure FirebaseUI.
+const uiConfig = {
+    signInFlow: 'popup',
+
+    signInOptions: [
+        firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+        firebase.auth.EmailAuthProvider.PROVIDER_ID,
+        'anonymous',
+    ],
+
+    callbacks: {
+        // Avoid redirects after sign-in.
+        signInSuccessWithAuthResult: () => false,
+    },
+}
 
 function App() {
-  const [count, setCount] = useState(0)
+    const [isSignedIn, setIsSignedIn] = useState(false) // Local signed-in state.
 
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>Hello Vite + React!</p>
-        <p>
-          <button type="button" onClick={() => setCount((count) => count + 1)}>
-            count is: {count}
-          </button>
-        </p>
-        <p>
-          Edit <code>App.tsx</code> and save to test HMR updates.
-        </p>
-        <p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-          {' | '}
-          <a
-            className="App-link"
-            href="https://vitejs.dev/guide/features.html"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Vite Docs
-          </a>
-        </p>
-      </header>
-    </div>
-  )
+    // Listen to the Firebase Auth state and set the local state.
+    // Make sure we un-register Firebase observers when the component unmounts.
+    useEffect(() => {
+        const unregisterAuthObserver = firebase
+            .auth()
+            .onAuthStateChanged((user) => {
+                setIsSignedIn(!!user)
+            })
+        return () => unregisterAuthObserver()
+    }, [])
+
+    if (!isSignedIn) {
+        return (
+            <div>
+                <h1>My App</h1>
+                <p>Please sign-in:</p>
+                <StyledFirebaseAuth
+                    uiConfig={uiConfig}
+                    firebaseAuth={firebase.auth()}
+                />
+            </div>
+        )
+    }
+    return <LoggedIn />
 }
 
 export default App
