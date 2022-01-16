@@ -1,74 +1,68 @@
-import React, { useEffect, useState } from 'react'
-import StyledFirebaseAuthOrigin from 'react-firebaseui/StyledFirebaseAuth'
-import firebase from 'firebase/compat/app'
-import 'firebase/compat/auth'
-import { LoggedIn } from './Components/LoggedIn'
-
-// https://github.com/vitejs/vite/issues/2139#issuecomment-854960323
-function interopDefault<T>(value: T): T {
-    return (value as any).default
-}
-const StyledFirebaseAuth = interopDefault(StyledFirebaseAuthOrigin)
+import { useEffect, useState } from "react";
+import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";
+import firebase from "firebase/compat/app";
+import "firebase/compat/auth";
+import { LoggedIn } from "./Components/LoggedIn";
 
 const firebaseConfig = {
-    apiKey: 'AIzaSyBGo3J39Lyfai2wjVi_5MsTGDFmCcE7v34',
+  apiKey: "AIzaSyBGo3J39Lyfai2wjVi_5MsTGDFmCcE7v34",
 
-    authDomain: 'schedmeet.firebaseapp.com',
+  authDomain: "schedmeet.firebaseapp.com",
 
-    projectId: 'schedmeet',
+  projectId: "schedmeet",
 
-    storageBucket: 'schedmeet.appspot.com',
+  storageBucket: "schedmeet.appspot.com",
 
-    messagingSenderId: '395404504769',
+  messagingSenderId: "395404504769",
 
-    appId: '1:395404504769:web:37f04cf38bd19772c36e40',
-}
+  appId: "1:395404504769:web:37f04cf38bd19772c36e40",
+};
 
-firebase.initializeApp(firebaseConfig)
+firebase.initializeApp(firebaseConfig);
 
 // Configure FirebaseUI.
 const uiConfig = {
-    signInFlow: 'popup',
+  signInFlow: "popup",
 
-    signInOptions: [
-        firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-        firebase.auth.EmailAuthProvider.PROVIDER_ID,
-        'anonymous',
-    ],
+  signInOptions: [
+    firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+    firebase.auth.EmailAuthProvider.PROVIDER_ID,
+    "anonymous",
+  ],
 
-    callbacks: {
-        // Avoid redirects after sign-in.
-        signInSuccessWithAuthResult: () => false,
-    },
-}
+  callbacks: {
+    // Avoid redirects after sign-in.
+    signInSuccessWithAuthResult: () => false,
+  },
+};
 
 function App() {
-    const [isSignedIn, setIsSignedIn] = useState(false) // Local signed-in state.
+  const [isSignedIn, setIsSignedIn] = useState(false); // Local signed-in state.
 
-    // Listen to the Firebase Auth state and set the local state.
-    // Make sure we un-register Firebase observers when the component unmounts.
-    useEffect(() => {
-        const unregisterAuthObserver = firebase
-            .auth()
-            .onAuthStateChanged((user) => {
-                setIsSignedIn(!!user)
-            })
-        return () => unregisterAuthObserver()
-    }, [])
+  // Listen to the Firebase Auth state and set the local state.
+  // Make sure we un-register Firebase observers when the component unmounts.
+  useEffect(() => {
+    const unregisterAuthObserver = firebase
+      .auth()
+      .onAuthStateChanged((user) => {
+        setIsSignedIn(!!user);
+      });
+    return () => unregisterAuthObserver();
+  }, []);
 
-    if (!isSignedIn) {
-        return (
-            <div>
-                <h1>My App</h1>
-                <p>Please sign-in:</p>
-                <StyledFirebaseAuth
-                    uiConfig={uiConfig}
-                    firebaseAuth={firebase.auth()}
-                />
-            </div>
-        )
-    }
-    return <LoggedIn />
+  if (!isSignedIn) {
+    return (
+      <div>
+        <h1>My App</h1>
+        <p>Please sign-in:</p>
+        <StyledFirebaseAuth
+          uiConfig={uiConfig}
+          firebaseAuth={firebase.auth()}
+        />
+      </div>
+    );
+  }
+  return <LoggedIn />;
 }
 
-export default App
+export default App;
