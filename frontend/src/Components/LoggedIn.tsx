@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import firebase from "firebase/compat/app";
 import { testAuthPath } from "../constants";
 import axios from "axios";
+import { MyCalendar } from "./Calendar";
+import "react-big-calendar/lib/css/react-big-calendar.css";
 
 export const LoggedIn = () => {
   const [authToken, setAuthToken] = useState("");
@@ -48,6 +50,7 @@ export const LoggedIn = () => {
       <p>Welcome {name}! You are now signed-in!</p>
       <p>Current Token: {authToken}</p>
       <p>Unique ID: {uid}</p>
+      <MyCalendar></MyCalendar>
       <button onClick={() => firebase.auth().signOut()}>Sign-out</button>
     </div>
   );
