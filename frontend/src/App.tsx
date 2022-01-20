@@ -3,6 +3,7 @@ import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";
 import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
 import { LoggedIn } from "./Components/LoggedIn";
+import { useAuthStore } from "./stores/authStore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBGo3J39Lyfai2wjVi_5MsTGDFmCcE7v34",
@@ -38,7 +39,7 @@ const uiConfig = {
 
 function App() {
   const [isSignedIn, setIsSignedIn] = useState(false); // Local signed-in state.
-
+  const { setFireBaseUser } = useAuthStore();
   // Listen to the Firebase Auth state and set the local state.
   // Make sure we un-register Firebase observers when the component unmounts.
   useEffect(() => {
@@ -46,6 +47,9 @@ function App() {
       .auth()
       .onAuthStateChanged((user) => {
         setIsSignedIn(!!user);
+        if (user !== null) {
+          setFireBaseUser(user);
+        }
       });
     return () => unregisterAuthObserver();
   }, []);

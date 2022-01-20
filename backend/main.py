@@ -1,13 +1,18 @@
 import os
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
-from endpoints import hello
+from endpoints import hello, calendar
 
 app = FastAPI()
 
 app.include_router(
     hello.router,
-    prefix="",
+    prefix="/auth",
+)
+
+app.include_router(
+    calendar.router,
+    prefix="/calendar",
 )
 
 ENVIRONMENT = os.environ.get("ENVIRONMENT", "dev")
@@ -23,7 +28,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 
 @app.get("/")
 def read_root():
