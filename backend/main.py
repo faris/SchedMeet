@@ -2,6 +2,7 @@ import os
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
 from endpoints import hello, calendar
+from endpoints.models.dynamo_models import DDBCalendarEvent
 
 app = FastAPI()
 
@@ -32,3 +33,6 @@ app.add_middleware(
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
+
+if not DDBCalendarEvent.exists():
+        DDBCalendarEvent.create_table(read_capacity_units=5, write_capacity_units=1, wait=True)
