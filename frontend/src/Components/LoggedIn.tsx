@@ -10,6 +10,10 @@ export const LoggedIn = () => {
     retrieveAuthToken();
   }, []);
 
+  if (authToken === "") {
+    return <span> Loading.....</span>;
+  }
+
   return (
     <div>
       <h1>My App</h1>

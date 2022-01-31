@@ -2,6 +2,7 @@ import os
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
 from endpoints import hello, calendar
+from endpoints.models.relational_models import metadata_object, engine
 
 app = FastAPI()
 
@@ -29,6 +30,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
+
+
+metadata_object.create_all(engine)

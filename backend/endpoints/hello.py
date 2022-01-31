@@ -8,4 +8,3 @@ router = APIRouter()
 @router.post("/test")
 async def test_auth(key: str = Depends(authenticated_uid_check)):
     return {"user_id": key}
-

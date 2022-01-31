@@ -6,6 +6,7 @@ export const baseURL =
     : `https://api.schedmeet.com`;
 
 export const testAuthPath = `${baseURL}/auth/test`;
+export const calendarPath = `${baseURL}/calendar`;
 
 interface SchedMeetMetadata {
   event_id: string;

@@ -4,6 +4,9 @@ import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
 import { LoggedIn } from "./Components/LoggedIn";
 import { useAuthStore } from "./stores/authStore";
+import { QueryClient, QueryClientProvider } from "react-query";
+
+const queryClient = new QueryClient();
 
 const firebaseConfig = {
   apiKey: "AIzaSyBGo3J39Lyfai2wjVi_5MsTGDFmCcE7v34",
@@ -66,7 +69,12 @@ function App() {
       </div>
     );
   }
-  return <LoggedIn />;
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <LoggedIn />
+    </QueryClientProvider>
+  );
 }
 
 export default App;
