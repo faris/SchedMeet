@@ -39,8 +39,13 @@ const localizer = dateFnsLocalizer({
 
 export const MyCalendar = () => {
   const { authToken } = useAuthStore();
-  const { setCalendarEvents, calendarEvents, addEvent, moveCalendarEvent } =
-    useCalendarStore();
+  const {
+    setCalendarEvents,
+    calendarEvents,
+    addEvent,
+    moveCalendarEvent,
+    resizeCalendarEvent,
+  } = useCalendarStore();
   const queryClient = useQueryClient();
 
   console.log(calendarEvents);
@@ -62,7 +67,7 @@ export const MyCalendar = () => {
   });
 
   const updateEventMutation = useMutation(updateEventMutationFunction, {
-    mutationKey: "addNewEvent",
+    mutationKey: "updateExistingEvent",
   });
 
   const moveEvent: withDragAndDropProps["onEventResize"] = ({
@@ -77,7 +82,6 @@ export const MyCalendar = () => {
     isAllDay: boolean;
   }) => {
     const movedEvent = moveCalendarEvent(event, start, end, isAllDay);
-    console.log(movedEvent);
 
     if (movedEvent) {
       updateEventMutation.mutate(
@@ -103,16 +107,21 @@ export const MyCalendar = () => {
     start: stringOrDate;
     end: stringOrDate;
   }) => {
-    const events = calendarEvents;
+    const resizedCalendarEvent = resizeCalendarEvent(event, start, end);
 
-    const nextEvents = events.map((existingEvent) => {
-      return existingEvent?.resource?.event_id == event?.resource?.event_id
-        ? ({ ...existingEvent, start, end } as SchedMeetEvent)
-        : existingEvent;
-    });
-
-    setCalendarEvents(nextEvents);
-    console.log("resizing........");
+    if (resizedCalendarEvent) {
+      updateEventMutation.mutate(
+        { movedEvent: resizedCalendarEvent, authToken },
+        {
+          onError: () => {
+            queryClient.invalidateQueries(["fetchCalendarEvents"]);
+            alert(
+              `ERROR: Resizing of event ${resizedCalendarEvent.title} did not go through, please try again`
+            );
+          },
+        }
+      );
+    }
   };
 
   const onSelectSlot = (slotInfo: SlotInfo) => {

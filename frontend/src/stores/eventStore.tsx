@@ -14,6 +14,11 @@ interface CalendarState {
     end: stringOrDate,
     isAllDay: boolean
   ) => SchedMeetEvent | undefined;
+  resizeCalendarEvent: (
+    calendarEvent: SchedMeetEvent,
+    start: stringOrDate,
+    end: stringOrDate
+  ) => SchedMeetEvent | undefined;
   setCalendarEvents: (calendarEvents: SchedMeetEvent[]) => void;
 }
 
@@ -50,6 +55,25 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
       eventToBeUpdated.start = start as Date;
       eventToBeUpdated.end = end as Date;
       eventToBeUpdated.allDay = isAllDay;
+    }
+
+    set({ calendarEvents: events });
+    return eventToBeUpdated;
+  },
+  resizeCalendarEvent: (
+    event: SchedMeetEvent,
+    start: stringOrDate,
+    end: stringOrDate
+  ) => {
+    const events = get().calendarEvents;
+
+    const eventToBeUpdated = events.find((existingEvent) => {
+      return existingEvent?.resource?.event_id == event?.resource?.event_id;
+    });
+
+    if (eventToBeUpdated) {
+      eventToBeUpdated.start = start as Date;
+      eventToBeUpdated.end = end as Date;
     }
 
     set({ calendarEvents: events });
