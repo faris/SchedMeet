@@ -49,6 +49,13 @@ function App() {
     const unregisterAuthObserver = firebase
       .auth()
       .onAuthStateChanged((user) => {
+        // TODO: maybe give identifiers to anonymous accounts.
+        if (user?.isAnonymous && user?.displayName === null) {
+          user.updateProfile({
+            displayName: "Jane Q. User",
+          });
+        }
+
         setIsSignedIn(!!user);
         if (user !== null) {
           setFireBaseUser(user);

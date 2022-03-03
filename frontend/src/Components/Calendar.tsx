@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Calendar, dateFnsLocalizer, SlotInfo } from "react-big-calendar";
+import { WeekEventComponent } from "../Components/EventComponent";
 import format from "date-fns/format";
 import parse from "date-fns/parse";
 import startOfWeek from "date-fns/startOfWeek";
@@ -126,6 +127,7 @@ export const MyCalendar = () => {
 
   const onSelectSlot = (slotInfo: SlotInfo) => {
     const title = window.prompt("New Event Name");
+    // const description = window.prompt("Enter Description");
 
     if (title) {
       const newEvent = {
@@ -171,8 +173,14 @@ export const MyCalendar = () => {
       onSelectEvent={(event) => alert(event.title)}
       style={{ height: "60vh" }}
       onEventDrop={moveEvent}
-      views={["week", "day", "agenda"]}
+      step={15}
+      views={["week", "day"]}
       scrollToTime={new Date()}
+      components={{
+        week: {
+          event: WeekEventComponent,
+        },
+      }}
     />
   );
 };

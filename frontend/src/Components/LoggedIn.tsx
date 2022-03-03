@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import firebase from "firebase/compat/app";
 import { useAuthStore } from "../stores/authStore";
 import { MyCalendar } from "./Calendar";
+import { SignupForm } from "./CreateEvent";
 
 export const LoggedIn = () => {
   const { retrieveAuthToken, authToken, firebaseUser } = useAuthStore();
@@ -20,7 +21,8 @@ export const LoggedIn = () => {
       <p>Welcome {firebaseUser?.displayName}! You are now signed-in!</p>
       <p>Current Token: {authToken}</p>
       <p>Unique ID: {firebaseUser?.uid}</p>
-      <MyCalendar></MyCalendar>
+      <SignupForm></SignupForm>
+      {/* <MyCalendar></MyCalendar> */}
       <button onClick={() => firebase.auth().signOut()}>Sign-out</button>
     </div>
   );

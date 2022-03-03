@@ -10,6 +10,7 @@ export const calendarPath = `${baseURL}/calendar`;
 
 interface SchedMeetMetadata {
   event_id: string;
+  description?: string;
 }
 
 export interface SchedMeetEvent extends CalendarEvent {
