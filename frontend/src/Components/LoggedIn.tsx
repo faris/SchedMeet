@@ -19,9 +19,10 @@ export const LoggedIn = () => {
     <div>
       <h1>My App</h1>
       <p>Welcome {firebaseUser?.displayName}! You are now signed-in!</p>
-      <p>Current Token: {authToken}</p>
+      {/* <p>Current Token: {authToken}</p> */}
       <p>Unique ID: {firebaseUser?.uid}</p>
       <SignupForm></SignupForm>
+
       {/* <MyCalendar></MyCalendar> */}
       <button onClick={() => firebase.auth().signOut()}>Sign-out</button>
     </div>
