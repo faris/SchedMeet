@@ -5,6 +5,11 @@ import "firebase/compat/auth";
 import { LoggedIn } from "./Components/LoggedIn";
 import { useAuthStore } from "./stores/authStore";
 import { QueryClient, QueryClientProvider } from "react-query";
+import { Routes, Route, Link } from "react-router-dom";
+import { MyCalendar } from "./Components/Calendar";
+import { enableMapSet } from "immer";
+
+enableMapSet();
 
 const queryClient = new QueryClient();
 
@@ -79,7 +84,11 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <LoggedIn />
+      <Routes>
+        <Route path="/" element={<LoggedIn />} />
+        <Route path="/calendar" element={<MyCalendar />} />
+        {/* <Route path="about" element={<About />} /> */}
+      </Routes>
     </QueryClientProvider>
   );
 }
