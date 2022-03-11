@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Calendar, dateFnsLocalizer, SlotInfo } from "react-big-calendar";
 import { WeekEventComponent } from "../Components/EventComponent";
 import format from "date-fns/format";
@@ -39,7 +39,7 @@ const localizer = dateFnsLocalizer({
 });
 
 export const MyCalendar = () => {
-  const { authToken } = useAuthStore();
+  const { authToken, retrieveAuthToken } = useAuthStore();
   const {
     setCalendarEvents,
     calendarEvents,
@@ -47,9 +47,12 @@ export const MyCalendar = () => {
     moveCalendarEvent,
     resizeCalendarEvent,
   } = useCalendarStore();
-  const queryClient = useQueryClient();
 
-  console.log(calendarEvents);
+  useEffect(() => {
+    retrieveAuthToken();
+  }, []);
+
+  const queryClient = useQueryClient();
 
   // background cache on failure of operation or after 5 mins and a remount.
   const fetchCalendarEvents = useQuery(

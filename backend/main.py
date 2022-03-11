@@ -3,6 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
 from endpoints import hello, calendar, admin
 from endpoints.models.relational_models import metadata_object, engine
+import logging
+import uvicorn
 
 app = FastAPI()
 
@@ -18,7 +20,7 @@ app.include_router(
 
 app.include_router(
     admin.router,
-    prefix="/admin",
+    prefix="/event",
 )
 
 ENVIRONMENT = os.environ.get("ENVIRONMENT", "dev")

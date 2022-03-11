@@ -7,10 +7,27 @@ export const baseURL =
 
 export const testAuthPath = `${baseURL}/auth/test`;
 export const calendarPath = `${baseURL}/calendar`;
+export const eventPath = `${baseURL}/event`;
 
 interface SchedMeetMetadata {
   event_id: string;
   description?: string;
+}
+
+export interface EventTimeRestrictions {
+  noEarlierThenTime: string;
+  noLaterThenTime: string;
+}
+
+export interface SchedMeetNewEvent {
+  title: string;
+  description: string;
+  availableDates: Date[];
+  timeRestrictions?: EventTimeRestrictions | null;
+}
+
+export interface SchedMeetEvent extends CalendarEvent {
+  resource?: SchedMeetMetadata;
 }
 
 export interface SchedMeetEvent extends CalendarEvent {

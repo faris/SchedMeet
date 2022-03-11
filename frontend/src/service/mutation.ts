@@ -1,5 +1,34 @@
 import axios from "axios";
-import { calendarPath, SchedMeetEvent } from "../constants";
+import {
+  calendarPath,
+  SchedMeetEvent,
+  eventPath,
+  SchedMeetNewEvent,
+} from "../constants";
+
+export const createNewEventMutation = ({
+  newEvent,
+  authToken,
+}: {
+  newEvent: SchedMeetNewEvent;
+  authToken: string;
+}) => {
+  // TODO: timeRestrictions
+  return axios.post<SchedMeetNewEvent>(
+    `${eventPath}/new`,
+    {
+      event_title: newEvent.title,
+      event_description: newEvent.description,
+      availableDates: newEvent.availableDates,
+      timeRestrictions: newEvent.timeRestrictions,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    }
+  );
+};
 
 export const addEventMutationFunction = ({
   newEvent,

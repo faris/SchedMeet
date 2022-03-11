@@ -32,11 +32,17 @@ eventsPDB = Table(
     Column("event_id", String, primary_key=True),
     Column("event_owner", String),
     Column("event_title", String),
-    Column("event_start_time", String),
-    Column("event_end_time", String),
+    Column("event_start_no_earlier_time", String),
+    Column("event_start_no_earlier_time", String),
     Column("description", String),
 )
 
+eventToDateTable = Table(
+    "event_dates",
+    metadata_object,
+    Column("event_id", String, ForeignKey("events.event_id"), primary_key=True),
+    Column("event_date", String, primary_key=True),
+)
 
 """Invitee set up table
 
@@ -74,8 +80,6 @@ availabilityPDB = Table(
     Column("availability_id", String, primary_key=True),
     Column("event_id", String, ForeignKey("events.event_id")),
     Column("event_attendee", String),
-    Column("availability_start", String),
-    Column("availability_end", String),
 )
 
 engine = create_engine(POSTGRES_CONNECTION_URL)

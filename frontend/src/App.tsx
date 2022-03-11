@@ -86,6 +86,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <Routes>
         <Route path="/" element={<LoggedIn />} />
+        <Route path="/event" element={<LoggedIn />} />
         <Route path="/calendar" element={<MyCalendar />} />
         {/* <Route path="about" element={<About />} /> */}
       </Routes>
