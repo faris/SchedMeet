@@ -19,7 +19,7 @@ export const createNewEventMutation = ({
     {
       event_title: newEvent.title,
       event_description: newEvent.description,
-      availableDates: newEvent.availableDates,
+      availableDates: newEvent.availableDateTimeIntervals,
       timeRestrictions: newEvent.timeRestrictions,
     },
     {

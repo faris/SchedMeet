@@ -14,10 +14,14 @@ import { EventTimeRestrictions, SchedMeetNewEvent } from "../constants";
 import { createNewEventMutation } from "../service/mutation";
 import { useMutation } from "react-query";
 import { useAuthStore } from "../stores/authStore";
+import { useEventStore } from "../stores/newTimeStore";
+import compareAsc from "date-fns/compareAsc";
 
 const DatePickerField = (...props: any[]) => {
   const [startDate, setStartDate] = React.useState<Date | null>(null);
   const [endDate, setEndDate] = React.useState<Date | null>(null);
+
+  const { selectedDates, deleteEventDate, addEventDate } = useEventStore();
 
   const {
     values,
@@ -27,23 +31,25 @@ const DatePickerField = (...props: any[]) => {
     errors,
   }: FormikContextType<SchedMeetNewEvent> = useFormikContext();
 
-  const [selectedDates, setSelectedDates] = React.useState<Map<string, Date>>(
-    new Map()
-  );
-
   return (
     <DatePicker
       customInput={
         <TextField
           fullWidth
-          id={"availableDates"}
-          name={"availableDates"}
+          id={"availableDateTimeIntervals"}
+          name={"availableDateTimeIntervals"}
           label={"Date Range(s)"}
           margin="normal"
-          value={values.availableDates}
+          value={values.availableDateTimeIntervals}
           onChange={handleChange}
-          error={touched.availableDates && Boolean(errors.availableDates)}
-          helperText={touched.availableDates && errors.availableDates}
+          error={
+            touched.availableDateTimeIntervals &&
+            Boolean(errors.availableDateTimeIntervals)
+          }
+          helperText={
+            touched.availableDateTimeIntervals &&
+            errors.availableDateTimeIntervals
+          }
         />
       }
       {...props}
@@ -62,27 +68,13 @@ const DatePickerField = (...props: any[]) => {
         setEndDate(end);
 
         if (start && !end && selectedDates.has(start.toISOString())) {
-          setSelectedDates(
-            produce(selectedDates, (selectedDates) => {
-              selectedDates.delete(start.toISOString());
-            })
-          );
+          deleteEventDate(start);
           setStartDate(null);
         } else if (start && end) {
-          const daysDifference = differenceInDays(end, start);
-          let tempDates = selectedDates;
-
-          for (let dayNumber = 0; dayNumber <= daysDifference; dayNumber++) {
-            const currentDate = addDays(start, dayNumber);
-            tempDates = produce(tempDates, (selectedDates) => {
-              selectedDates.set(currentDate.toISOString(), currentDate);
-            });
-          }
-
-          setSelectedDates(tempDates);
+          const newEventDates = addEventDate(start, end);
           setStartDate(null);
           setEndDate(null);
-          setFieldValue("availableDates", [...tempDates.values()]);
+          setFieldValue("availableDateTimeIntervals", newEventDates);
         }
       }}
     />
@@ -90,8 +82,8 @@ const DatePickerField = (...props: any[]) => {
 };
 
 const TimePickerField = (...props: any[]) => {
-  const [startTime, setStartTime] = React.useState<Date | undefined>();
-  const [endTime, setEndTime] = React.useState<Date | undefined>();
+  const { restrictedTimeInterval, updateRestrictedInterval } = useEventStore();
+  const [startTime, endTime] = restrictedTimeInterval;
 
   const {
     values,
@@ -102,20 +94,15 @@ const TimePickerField = (...props: any[]) => {
   }: FormikContextType<EventTimeRestrictions> = useFormikContext();
 
   const filterTimeForNoEarlier = (time: Date) => {
-    if (!endTime) {
-      return true;
-    } else {
-      // Weird Time bug so I add a bit of extra minutes that are less then the granularity to ensure results are not off.
-      return addMinutes(time, 10) < endTime;
-    }
+    return (
+      compareAsc(endTime, startTime) == 1 && compareAsc(endTime, time) == 1
+    );
   };
 
   const filterTimeForNoLater = (time: Date) => {
-    if (!startTime) {
-      return false;
-    } else {
-      return time > startTime;
-    }
+    return (
+      compareAsc(endTime, startTime) == 1 && compareAsc(time, startTime) == 1
+    );
   };
 
   return (
@@ -145,7 +132,7 @@ const TimePickerField = (...props: any[]) => {
         selected={startTime}
         onChange={(time) => {
           if (time) {
-            setStartTime(time);
+            updateRestrictedInterval(time, restrictedTimeInterval[1]);
             setFieldValue("noEarlierThenTime", time);
           }
         }}
@@ -175,8 +162,9 @@ const TimePickerField = (...props: any[]) => {
         filterTime={filterTimeForNoLater}
         onChange={(time) => {
           if (time) {
-            setEndTime(time);
+            console.log(time);
             setFieldValue("noLaterThenTime", time);
+            updateRestrictedInterval(restrictedTimeInterval[0], time);
           }
         }}
         showTimeSelect
@@ -207,7 +195,7 @@ export const SignupForm = () => {
           const newEvent = {
             title: values.title,
             description: values.description,
-            availableDates: values.availableDates,
+            availableDateTimeIntervals: values.availableDateTimeIntervals,
             timeRestrictions:
               values.noEarlierThenTime && values.noLaterThenTime
                 ? {
@@ -225,7 +213,7 @@ export const SignupForm = () => {
         initialValues={{
           title: "",
           description: "",
-          availableDates: [] as Date[],
+          availableDateTimeIntervals: [] as Date[],
           timeSlotGranularity: 15,
           noEarlierThenTime: null,
           noLaterThenTime: null,
@@ -236,7 +224,7 @@ export const SignupForm = () => {
             .required("Required"),
           description: Yup.string().required("Required"),
           timeSlotGranularity: Yup.number().min(15),
-          availableDates: Yup.array().min(1),
+          availableDateTimeIntervals: Yup.array().min(1),
           noEarlierThenTime: Yup.string().nullable(true),
           noLaterThenTime: Yup.string().nullable(true),
         })}

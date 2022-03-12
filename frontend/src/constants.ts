@@ -22,7 +22,7 @@ export interface EventTimeRestrictions {
 export interface SchedMeetNewEvent {
   title: string;
   description: string;
-  availableDates: Date[];
+  availableDateTimeIntervals: Date[];
   timeRestrictions?: EventTimeRestrictions | null;
 }
 
