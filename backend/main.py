@@ -1,7 +1,7 @@
 import os
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
-from endpoints import hello, calendar, admin
+from endpoints import hello, availability, admin
 from endpoints.models.relational_models import metadata_object, engine
 import logging
 import uvicorn
@@ -14,8 +14,8 @@ app.include_router(
 )
 
 app.include_router(
-    calendar.router,
-    prefix="/calendar",
+    availability.router,
+    prefix="/availability",
 )
 
 app.include_router(
@@ -43,4 +43,4 @@ def read_root():
     return {"Hello": "World"}
 
 
-metadata_object.create_all(engine,checkfirst=True)
+metadata_object.create_all(engine, checkfirst=True)

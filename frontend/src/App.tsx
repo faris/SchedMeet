@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";
 import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
-import { LoggedIn } from "./Components/LoggedIn";
+import { CreateNewEventPage } from "./Components/LoggedIn";
 import { useAuthStore } from "./stores/authStore";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { Routes, Route, Link } from "react-router-dom";
@@ -85,10 +85,8 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <Routes>
-        <Route path="/" element={<LoggedIn />} />
-        <Route path="/event" element={<LoggedIn />} />
-        <Route path="/calendar" element={<MyCalendar />} />
-        {/* <Route path="about" element={<About />} /> */}
+        <Route path="/" element={<CreateNewEventPage />} />
+        <Route path="/event/:event_id" element={<MyCalendar />} />
       </Routes>
     </QueryClientProvider>
   );

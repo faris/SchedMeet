@@ -3,24 +3,23 @@ import {
   calendarPath,
   SchedMeetEvent,
   eventPath,
-  SchedMeetNewEvent,
+  SchedMeetNewEventRequest,
 } from "../constants";
 
 export const createNewEventMutation = ({
   newEvent,
   authToken,
 }: {
-  newEvent: SchedMeetNewEvent;
+  newEvent: SchedMeetNewEventRequest;
   authToken: string;
 }) => {
   // TODO: timeRestrictions
-  return axios.post<SchedMeetNewEvent>(
+  return axios.post<SchedMeetNewEventRequest>(
     `${eventPath}/new`,
     {
       event_title: newEvent.title,
       event_description: newEvent.description,
-      availableDates: newEvent.availableDateTimeIntervals,
-      timeRestrictions: newEvent.timeRestrictions,
+      datetime_intervals: newEvent.availableDateTimeIntervals,
     },
     {
       headers: {

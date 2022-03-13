@@ -7,6 +7,9 @@ from sqlalchemy import (
     MetaData,
     ForeignKey,
 )
+
+from sqlalchemy.dialects.postgresql import TSTZRANGE
+
 import os
 
 
@@ -22,8 +25,6 @@ The event is set up by the admin with the following data:
 event_id : ID generated when creating the event data  
 event_owner : firebase_user who created the event
 event_title : The name of the proposed meeting
-event_start_time: The earliest possible time-frame that availability can be selected for.
-event_end_time: The latest possible time-frame that availability can be selected for.
 description: The description for the event.
 """
 eventsPDB = Table(
@@ -32,16 +33,14 @@ eventsPDB = Table(
     Column("event_id", String, primary_key=True),
     Column("event_owner", String),
     Column("event_title", String),
-    Column("event_start_no_earlier_time", String),
-    Column("event_start_no_earlier_time", String),
-    Column("description", String),
+    Column("event_description", String),
 )
 
 eventToDateTable = Table(
-    "event_dates",
+    "event_time_ranges",
     metadata_object,
     Column("event_id", String, ForeignKey("events.event_id"), primary_key=True),
-    Column("event_date", String, primary_key=True),
+    Column("event_datetime_interval", TSTZRANGE, primary_key=True),
 )
 
 """Invitee set up table
@@ -52,7 +51,6 @@ invite_id = firebase_user
 event_id = the event id
 
 """
-
 
 inviteePDB = Table(
     "invitee",

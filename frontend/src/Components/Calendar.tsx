@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Routes, Route, useParams } from "react-router-dom";
 import { Calendar, dateFnsLocalizer, SlotInfo } from "react-big-calendar";
 import { WeekEventComponent } from "../Components/EventComponent";
 import format from "date-fns/format";
@@ -20,7 +21,7 @@ import {
   addEventMutationFunction,
   updateEventMutationFunction,
 } from "../service/mutation";
-import { getEvents } from "../service/query";
+import { getEventInformation } from "../service/query";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 // https://github.com/jquense/react-big-calendar/issues/1842
 // TODO: Investigate fix later
@@ -40,6 +41,7 @@ const localizer = dateFnsLocalizer({
 
 export const MyCalendar = () => {
   const { authToken, retrieveAuthToken } = useAuthStore();
+  const { event_id } = useParams();
   const {
     setCalendarEvents,
     calendarEvents,
@@ -55,14 +57,16 @@ export const MyCalendar = () => {
   const queryClient = useQueryClient();
 
   // background cache on failure of operation or after 5 mins and a remount.
+
   const fetchCalendarEvents = useQuery(
     ["fetchCalendarEvents", authToken],
-    () => getEvents(authToken),
+    () => getEventInformation(authToken, event_id || ""),
     {
       onSuccess: (data) => {
-        setCalendarEvents(data);
+        setCalendarEvents([]);
       },
       staleTime: 300000,
+      enabled: !!authToken && event_id !== undefined,
     }
   );
 

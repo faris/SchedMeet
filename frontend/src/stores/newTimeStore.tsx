@@ -1,12 +1,14 @@
 import create from "zustand";
 import startOfToday from "date-fns/startOfToday";
-import format from "date-fns/format";
-import { addDays, differenceInDays, addMinutes } from "date-fns";
-
-const keepOnlyDateMonthYear = (date: Date) => {
-  return format(date, "MM/dd/yyyy");
-};
-
+import {
+  addDays,
+  differenceInDays,
+  addHours,
+  getHours,
+  getMinutes,
+} from "date-fns";
+import { zonedTimeToUtc } from "date-fns-tz";
+import { addMinutes } from "date-fns/esm";
 // todo: add timezone
 // strip hour and minute from restrictedTimeInterval (timepicker)
 // strip year, month, day from selectedDates (datepicker)
@@ -53,7 +55,10 @@ export const useEventStore = create<EventStore>((set, get) => ({
     return [...selectedDates.values()];
   },
 
-  restrictedTimeInterval: [startOfToday(), addMinutes(startOfToday(), 15)],
+  restrictedTimeInterval: [
+    addHours(startOfToday(), 9),
+    addHours(startOfToday(), 17),
+  ],
   updateRestrictedInterval: (start: Date, end: Date) => {
     set({ restrictedTimeInterval: [start, end] });
     return [start, end];
@@ -62,10 +67,49 @@ export const useEventStore = create<EventStore>((set, get) => ({
   timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
   // TODO: Implement and remove granularity
   updateTimeZone: (timezone: string) => {
+    set({
+      timeZone: timezone,
+    });
     return "";
   },
   // TODO using date-fns-tz
   prepareInterval: () => {
-    return [];
+    const { timeZone, restrictedTimeInterval, selectedDates } = get();
+
+    const arr = [];
+
+    const getHoursAndMinutes = (date: Date) => {
+      return [getHours(date), getMinutes(date)];
+    };
+
+    const upgradeDateToDateTime = (time: Date, dateTime: Date) => {
+      const [hours, minutes] = getHoursAndMinutes(dateTime);
+      return addHours(addMinutes(time, minutes), hours);
+    };
+
+    const convertDateToDateTimeInterval = (
+      date: Date,
+      interval: [Date, Date],
+      timezone: string
+    ) => {
+      const startTime = zonedTimeToUtc(
+        upgradeDateToDateTime(date, interval[0]),
+        timezone
+      );
+      const endTime = zonedTimeToUtc(
+        upgradeDateToDateTime(date, interval[1]),
+        timezone
+      );
+
+      return [startTime, endTime] as [Date, Date];
+    };
+
+    for (const date of selectedDates.values()) {
+      arr.push(
+        convertDateToDateTimeInterval(date, restrictedTimeInterval, timeZone)
+      );
+    }
+
+    return arr;
   },
 }));

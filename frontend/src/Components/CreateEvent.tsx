@@ -1,21 +1,24 @@
 import React, { useEffect } from "react";
 import Stack from "@mui/material/Stack";
 import MenuItem from "@mui/material/MenuItem";
-import produce from "immer";
 import { useFormikContext, Formik, FormikContextType, Form } from "formik";
 import * as Yup from "yup";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "../styles/calendar-overrides.css";
-import { addDays, differenceInDays, addMinutes } from "date-fns";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import { EventTimeRestrictions, SchedMeetNewEvent } from "../constants";
+import {
+  EventTimeRestrictions,
+  SchedMeetNewEventFormValues,
+  timeZoneList,
+} from "../constants";
 import { createNewEventMutation } from "../service/mutation";
 import { useMutation } from "react-query";
 import { useAuthStore } from "../stores/authStore";
 import { useEventStore } from "../stores/newTimeStore";
 import compareAsc from "date-fns/compareAsc";
+import { getTimeZones } from "@vvo/tzdb";
 
 const DatePickerField = (...props: any[]) => {
   const [startDate, setStartDate] = React.useState<Date | null>(null);
@@ -29,7 +32,7 @@ const DatePickerField = (...props: any[]) => {
     setFieldValue,
     touched,
     errors,
-  }: FormikContextType<SchedMeetNewEvent> = useFormikContext();
+  }: FormikContextType<SchedMeetNewEventFormValues> = useFormikContext();
 
   return (
     <DatePicker
@@ -162,7 +165,7 @@ const TimePickerField = (...props: any[]) => {
         filterTime={filterTimeForNoLater}
         onChange={(time) => {
           if (time) {
-            console.log(time);
+            // console.log(time);
             setFieldValue("noLaterThenTime", time);
             updateRestrictedInterval(restrictedTimeInterval[0], time);
           }
@@ -177,8 +180,46 @@ const TimePickerField = (...props: any[]) => {
   );
 };
 
+export const TimeZonePicker = () => {
+  const { timeZone, updateTimeZone } = useEventStore();
+  const {
+    values,
+    handleChange,
+    setFieldValue,
+    touched,
+    errors,
+  }: FormikContextType<SchedMeetNewEventFormValues> = useFormikContext();
+
+  const timeZoneOnChangeHandler = (e: any) => {
+    updateTimeZone(e.target.value);
+    setFieldValue("timezone", e.target.value);
+  };
+
+  return (
+    <TextField
+      margin="normal"
+      fullWidth
+      select
+      name="timezone"
+      id="timezone"
+      label="Selected Time Zone"
+      onChange={timeZoneOnChangeHandler}
+      value={values.timeZone}
+      error={touched.timeZone && Boolean(errors.timeZone)}
+      helperText={touched.timeZone && errors.timeZone}
+    >
+      {timeZoneList.map((tz) => (
+        <MenuItem key={tz.tzCode} value={tz.tzCode}>
+          {tz.label}
+        </MenuItem>
+      ))}
+    </TextField>
+  );
+};
+
 export const SignupForm = () => {
   const { authToken, retrieveAuthToken } = useAuthStore();
+  const { timeZone, restrictedTimeInterval, prepareInterval } = useEventStore();
 
   useEffect(() => {
     retrieveAuthToken();
@@ -195,14 +236,8 @@ export const SignupForm = () => {
           const newEvent = {
             title: values.title,
             description: values.description,
-            availableDateTimeIntervals: values.availableDateTimeIntervals,
-            timeRestrictions:
-              values.noEarlierThenTime && values.noLaterThenTime
-                ? {
-                    noEarlierThenTime: values.noEarlierThenTime,
-                    noLaterThenTime: values.noLaterThenTime,
-                  }
-                : null,
+            availableDateTimeIntervals: prepareInterval(),
+            timeZone: values.timezone,
           };
 
           createNewEvent.mutate({ newEvent, authToken });
@@ -214,16 +249,16 @@ export const SignupForm = () => {
           title: "",
           description: "",
           availableDateTimeIntervals: [] as Date[],
-          timeSlotGranularity: 15,
-          noEarlierThenTime: null,
-          noLaterThenTime: null,
+          timezone: timeZone,
+          noEarlierThenTime: restrictedTimeInterval[0],
+          noLaterThenTime: restrictedTimeInterval[1],
         }}
         validationSchema={Yup.object({
           title: Yup.string()
             .max(15, "Must be 15 characters or less")
             .required("Required"),
           description: Yup.string().required("Required"),
-          timeSlotGranularity: Yup.number().min(15),
+          timezone: Yup.string().required(),
           availableDateTimeIntervals: Yup.array().min(1),
           noEarlierThenTime: Yup.string().nullable(true),
           noLaterThenTime: Yup.string().nullable(true),
@@ -260,34 +295,7 @@ export const SignupForm = () => {
               }
             ></TextField>
 
-            <TextField
-              margin="normal"
-              fullWidth
-              select
-              name="timeSlotGranularity"
-              id="timeSlotGranularity"
-              label="Time Slot Granularity"
-              onChange={formik.handleChange}
-              value={formik.values.timeSlotGranularity}
-              error={
-                formik.touched.timeSlotGranularity &&
-                Boolean(formik.errors.timeSlotGranularity)
-              }
-              helperText={
-                formik.touched.timeSlotGranularity &&
-                formik.errors.timeSlotGranularity
-              }
-            >
-              <MenuItem key={1} value={15}>
-                15 minutes
-              </MenuItem>
-              <MenuItem key={2} value={30}>
-                30 minutes
-              </MenuItem>
-              <MenuItem key={3} value={60}>
-                1 hour
-              </MenuItem>
-            </TextField>
+            <TimeZonePicker></TimeZonePicker>
 
             <DatePickerField></DatePickerField>
             <TimePickerField></TimePickerField>

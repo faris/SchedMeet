@@ -1,7 +1,8 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-from typing import Optional, List
+from typing import Optional, List, Tuple
 from datetime import datetime
+
 
 class CalendarEvent(BaseModel):
     event_id: str
@@ -11,12 +12,7 @@ class CalendarEvent(BaseModel):
     description: Optional[str] = None
 
 
-class TimeRestrictionModel(BaseModel):
-    noEarlierThenTime: datetime
-    noLaterThenTime: datetime
-
 class NewEventRequest(BaseModel):
     event_title: str
     event_description: str
-    availableDates: List[datetime]
-    timeRestrictions: TimeRestrictionModel | None
+    datetime_intervals: List[Tuple[datetime, datetime]]
