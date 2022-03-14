@@ -6,38 +6,46 @@ import { useMutation } from "react-query";
 import { stringOrDate } from "react-big-calendar";
 
 interface CalendarState {
-  calendarEvents: SchedMeetEvent[];
-  addEvent: (event: SchedMeetEvent) => void;
-  moveCalendarEvent: (
+  userAvailabilitySlots: SchedMeetEvent[];
+  eventTimeSlots: Array<[Date, Date]>;
+  eventMetadata: { title: string; description: string };
+  addAvailabilitySlot: (event: SchedMeetEvent) => void;
+  moveAvailabilitySlot: (
     calendarEvent: SchedMeetEvent,
     start: stringOrDate,
     end: stringOrDate,
     isAllDay: boolean
   ) => SchedMeetEvent | undefined;
-  resizeCalendarEvent: (
+  resizeAvailabilitySlot: (
     calendarEvent: SchedMeetEvent,
     start: stringOrDate,
     end: stringOrDate
   ) => SchedMeetEvent | undefined;
-  setCalendarEvents: (calendarEvents: SchedMeetEvent[]) => void;
+  setAvailabilitySlots: (calendarEvents: SchedMeetEvent[]) => void;
+  setEventMetadata: (title: string, description: string) => void;
 }
 
 // locally manages state, to get rid of input delay that appears on inserting events
 export const useCalendarStore = create<CalendarState>((set, get) => ({
-  calendarEvents: [],
-  addEvent: (event: SchedMeetEvent) => {
-    set({ calendarEvents: [...get().calendarEvents, event] });
+  eventMetadata: { title: "", description: "" },
+  userAvailabilitySlots: [],
+  eventTimeSlots: [],
+  setEventMetadata: (title: string, description: string) => {
+    set({ eventMetadata: { title: title, description: description } });
   },
-  setCalendarEvents: (calendarEvents: SchedMeetEvent[]) => {
-    set({ calendarEvents: calendarEvents });
+  addAvailabilitySlot: (event: SchedMeetEvent) => {
+    set({ userAvailabilitySlots: [...get().userAvailabilitySlots, event] });
   },
-  moveCalendarEvent: (
+  setAvailabilitySlots: (calendarEvents: SchedMeetEvent[]) => {
+    set({ userAvailabilitySlots: calendarEvents });
+  },
+  moveAvailabilitySlot: (
     event: SchedMeetEvent,
     start: stringOrDate,
     end: stringOrDate,
     isAllDay: boolean
   ) => {
-    const events = get().calendarEvents;
+    const events = get().userAvailabilitySlots;
 
     let allDay = event.allDay;
 
@@ -57,15 +65,15 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
       eventToBeUpdated.allDay = isAllDay;
     }
 
-    set({ calendarEvents: events });
+    set({ userAvailabilitySlots: events });
     return eventToBeUpdated;
   },
-  resizeCalendarEvent: (
+  resizeAvailabilitySlot: (
     event: SchedMeetEvent,
     start: stringOrDate,
     end: stringOrDate
   ) => {
-    const events = get().calendarEvents;
+    const events = get().userAvailabilitySlots;
 
     const eventToBeUpdated = events.find((existingEvent) => {
       return existingEvent?.resource?.event_id == event?.resource?.event_id;
@@ -76,7 +84,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
       eventToBeUpdated.end = end as Date;
     }
 
-    set({ calendarEvents: events });
+    set({ userAvailabilitySlots: events });
     return eventToBeUpdated;
   },
 }));

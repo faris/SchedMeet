@@ -43,11 +43,13 @@ export const MyCalendar = () => {
   const { authToken, retrieveAuthToken } = useAuthStore();
   const { event_id } = useParams();
   const {
-    setCalendarEvents,
-    calendarEvents,
-    addEvent,
-    moveCalendarEvent,
-    resizeCalendarEvent,
+    setAvailabilitySlots,
+    userAvailabilitySlots,
+    addAvailabilitySlot,
+    moveAvailabilitySlot,
+    resizeAvailabilitySlot,
+    setEventMetadata,
+    eventMetadata,
   } = useCalendarStore();
 
   useEffect(() => {
@@ -63,7 +65,8 @@ export const MyCalendar = () => {
     () => getEventInformation(authToken, event_id || ""),
     {
       onSuccess: (data) => {
-        setCalendarEvents([]);
+        setAvailabilitySlots([]);
+        setEventMetadata(data.data.title, data.data.description);
       },
       staleTime: 300000,
       enabled: !!authToken && event_id !== undefined,
@@ -89,7 +92,7 @@ export const MyCalendar = () => {
     end: stringOrDate;
     isAllDay: boolean;
   }) => {
-    const movedEvent = moveCalendarEvent(event, start, end, isAllDay);
+    const movedEvent = moveAvailabilitySlot(event, start, end, isAllDay);
 
     if (movedEvent) {
       updateEventMutation.mutate(
@@ -115,7 +118,7 @@ export const MyCalendar = () => {
     start: stringOrDate;
     end: stringOrDate;
   }) => {
-    const resizedCalendarEvent = resizeCalendarEvent(event, start, end);
+    const resizedCalendarEvent = resizeAvailabilitySlot(event, start, end);
 
     if (resizedCalendarEvent) {
       updateEventMutation.mutate(
@@ -154,7 +157,7 @@ export const MyCalendar = () => {
           },
         }
       );
-      addEvent(newEvent);
+      addAvailabilitySlot(newEvent);
     }
   };
 
@@ -167,27 +170,31 @@ export const MyCalendar = () => {
   }
 
   return (
-    <DragAndDropCalendar
-      localizer={localizer}
-      events={calendarEvents}
-      startAccessor="start"
-      endAccessor="end"
-      selectable
-      resizable
-      onEventResize={resizeEvent}
-      defaultView={"week"}
-      onSelectSlot={onSelectSlot}
-      onSelectEvent={(event) => alert(event.title)}
-      style={{ height: "60vh" }}
-      onEventDrop={moveEvent}
-      step={15}
-      views={["week", "day"]}
-      scrollToTime={new Date()}
-      components={{
-        week: {
-          event: WeekEventComponent,
-        },
-      }}
-    />
+    <>
+      <h1>{eventMetadata.title}</h1>
+      <p>{eventMetadata.description}</p>
+      <DragAndDropCalendar
+        localizer={localizer}
+        events={userAvailabilitySlots}
+        startAccessor="start"
+        endAccessor="end"
+        selectable
+        resizable
+        onEventResize={resizeEvent}
+        defaultView={"week"}
+        onSelectSlot={onSelectSlot}
+        onSelectEvent={(event) => alert(event.title)}
+        style={{ height: "60vh" }}
+        onEventDrop={moveEvent}
+        step={15}
+        views={["week", "day"]}
+        scrollToTime={new Date()}
+        components={{
+          week: {
+            event: WeekEventComponent,
+          },
+        }}
+      />
+    </>
   );
 };
