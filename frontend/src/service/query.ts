@@ -6,8 +6,8 @@ export const getEventInformation = async (
   event_id: string
 ) => {
   const result = await axios.get<{
-    title: string;
-    description: string;
+    event_title: string;
+    event_description: string;
     availableDateTimeIntervals: Array<[string, string]>;
   }>(`${availabilityPath}/${event_id}`, {
     headers: {

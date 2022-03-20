@@ -22,6 +22,8 @@ import {
   updateEventMutationFunction,
 } from "../service/mutation";
 import { getEventInformation } from "../service/query";
+import CustomWeekView from "./utility/customview";
+
 import { useMutation, useQuery, useQueryClient } from "react-query";
 // https://github.com/jquense/react-big-calendar/issues/1842
 // TODO: Investigate fix later
@@ -64,9 +66,12 @@ export const MyCalendar = () => {
     ["fetchCalendarEvents", authToken],
     () => getEventInformation(authToken, event_id || ""),
     {
-      onSuccess: (data) => {
+      onSuccess: (response) => {
         setAvailabilitySlots([]);
-        setEventMetadata(data.data.title, data.data.description);
+        setEventMetadata(
+          response.data.event_title,
+          response.data.event_description
+        );
       },
       staleTime: 300000,
       enabled: !!authToken && event_id !== undefined,
@@ -137,7 +142,6 @@ export const MyCalendar = () => {
 
   const onSelectSlot = (slotInfo: SlotInfo) => {
     const title = window.prompt("New Event Name");
-    // const description = window.prompt("Enter Description");
 
     if (title) {
       const newEvent = {
@@ -169,6 +173,8 @@ export const MyCalendar = () => {
     return <span>Error: {fetchCalendarEvents.error}</span>;
   }
 
+  console.log(eventMetadata);
+
   return (
     <>
       <h1>{eventMetadata.title}</h1>
@@ -180,6 +186,7 @@ export const MyCalendar = () => {
         endAccessor="end"
         selectable
         resizable
+        showMultiDayTimes
         onEventResize={resizeEvent}
         defaultView={"week"}
         onSelectSlot={onSelectSlot}
@@ -187,7 +194,11 @@ export const MyCalendar = () => {
         style={{ height: "60vh" }}
         onEventDrop={moveEvent}
         step={15}
-        views={["week", "day"]}
+        views={{
+          month: true,
+          week: CustomWeekView,
+          day: true,
+        }}
         scrollToTime={new Date()}
         components={{
           week: {
