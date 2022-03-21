@@ -4,7 +4,9 @@ import { Navigate, NavigateAction, TitleOptions } from "react-big-calendar";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import TimeGrid from "react-big-calendar/lib/TimeGrid";
+import { useAvailableSlotsStore } from "../../stores/availabilityStore";
 
+// TODO: Change to named function non-default
 export default function CustomWeekView({
   date,
   localizer,
@@ -24,6 +26,8 @@ export default function CustomWeekView({
     [date, localizer]
   );
 
+  const { availableDateTimeIntervals } = useAvailableSlotsStore();
+
   return (
     <TimeGrid
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -33,7 +37,7 @@ export default function CustomWeekView({
       localizer={localizer}
       max={max}
       min={min}
-      range={currRange}
+      range={availableDateTimeIntervals || []}
       scrollToTime={scrollToTime}
       {...props}
     />
@@ -75,6 +79,6 @@ CustomWeekView.navigate = (
 };
 
 CustomWeekView.title = (date: Date, options: TitleOptions) => {
-  console.log(options);
+  // console.log(options);
   return "Hello World";
 };

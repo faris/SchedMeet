@@ -16,7 +16,7 @@ import {
 import { createNewEventMutation } from "../service/mutation";
 import { useMutation } from "react-query";
 import { useAuthStore } from "../stores/authStore";
-import { useEventStore } from "../stores/newTimeStore";
+import { useNewEventFormStore } from "../stores/newEventFormStore";
 import compareAsc from "date-fns/compareAsc";
 import { getTimeZones } from "@vvo/tzdb";
 
@@ -24,7 +24,8 @@ const DatePickerField = (...props: any[]) => {
   const [startDate, setStartDate] = React.useState<Date | null>(null);
   const [endDate, setEndDate] = React.useState<Date | null>(null);
 
-  const { selectedDates, deleteEventDate, addEventDate } = useEventStore();
+  const { selectedDates, deleteEventDate, addEventDate } =
+    useNewEventFormStore();
 
   const {
     values,
@@ -85,7 +86,8 @@ const DatePickerField = (...props: any[]) => {
 };
 
 const TimePickerField = (...props: any[]) => {
-  const { restrictedTimeInterval, updateRestrictedInterval } = useEventStore();
+  const { restrictedTimeInterval, updateRestrictedInterval } =
+    useNewEventFormStore();
   const [startTime, endTime] = restrictedTimeInterval;
 
   const {
@@ -181,7 +183,7 @@ const TimePickerField = (...props: any[]) => {
 };
 
 export const TimeZonePicker = () => {
-  const { timeZone, updateTimeZone } = useEventStore();
+  const { timeZone, updateTimeZone } = useNewEventFormStore();
   const {
     values,
     handleChange,
@@ -219,7 +221,8 @@ export const TimeZonePicker = () => {
 
 export const SignupForm = () => {
   const { authToken, retrieveAuthToken } = useAuthStore();
-  const { timeZone, restrictedTimeInterval, prepareInterval } = useEventStore();
+  const { timeZone, restrictedTimeInterval, prepareInterval } =
+    useNewEventFormStore();
 
   useEffect(() => {
     retrieveAuthToken();

@@ -23,6 +23,7 @@ import {
 } from "../service/mutation";
 import { getEventInformation } from "../service/query";
 import CustomWeekView from "./utility/customview";
+import { useAvailableSlotsStore } from "../stores/availabilityStore";
 
 import { useMutation, useQuery, useQueryClient } from "react-query";
 // https://github.com/jquense/react-big-calendar/issues/1842
@@ -54,6 +55,8 @@ export const MyCalendar = () => {
     eventMetadata,
   } = useCalendarStore();
 
+  const { setAvailableDateTimeIntervals } = useAvailableSlotsStore();
+
   useEffect(() => {
     retrieveAuthToken();
   }, []);
@@ -67,7 +70,7 @@ export const MyCalendar = () => {
     () => getEventInformation(authToken, event_id || ""),
     {
       onSuccess: (response) => {
-        setAvailabilitySlots([]);
+        setAvailableDateTimeIntervals(response.data.availableDateTimeIntervals);
         setEventMetadata(
           response.data.event_title,
           response.data.event_description

@@ -30,7 +30,7 @@ def get_events(event_id: str, user_id: str = Depends(authenticated_uid_check)):
         "event_id": event_id,
         "event_title": title,
         "event_description": description,
-        "availableTimeFrames" : availableTimeFrames
+        "availableDateTimeIntervals" : availableTimeFrames
     }
     else:
         raise HTTPException(status_code=404, detail="Event not found")
