@@ -1,15 +1,11 @@
 import create from "zustand";
-import firebase from "firebase/compat/app";
-import { SchedMeetEvent, calendarPath, testTimesArray } from "../constants";
-import axios from "axios";
-import { useMutation } from "react-query";
-import { stringOrDate } from "react-big-calendar";
+import { startOfDay, parseISO } from "date-fns";
 
 interface AvailabilityState {
-  availableDateTimeIntervals: Array<[Date, Date]>;
+  availableDateTimeIntervals: Array<Date>;
   setAvailableDateTimeIntervals: (
     availableDateTimeIntervals: Array<[string, string]>
-  ) => Array<[Date, Date]>;
+  ) => Array<Date>;
 }
 
 export const useAvailableSlotsStore = create<AvailabilityState>((set, get) => ({
@@ -17,16 +13,30 @@ export const useAvailableSlotsStore = create<AvailabilityState>((set, get) => ({
   setAvailableDateTimeIntervals: (
     availableDateTimeIntervals: Array<[string, string]>
   ) => {
-    const arr = [];
+    const datesAvailableForEvents = [];
+    const seenDates = new Set();
 
     for (const date of availableDateTimeIntervals) {
-      arr.push([new Date(date[0]), new Date(date[1])]);
+      const startTime = parseISO(date[0]);
+      const endTime = parseISO(date[1]);
+
+      const startTimeBeginningOfDayISO = startOfDay(startTime).toISOString();
+      const endTimeBeginningOfDayISO = startOfDay(endTime).toISOString();
+
+      if (!seenDates.has(startTimeBeginningOfDayISO)) {
+        datesAvailableForEvents.push(startTime);
+        seenDates.add(startTimeBeginningOfDayISO);
+      }
+      if (!seenDates.has(endTimeBeginningOfDayISO)) {
+        datesAvailableForEvents.push(endTime);
+        seenDates.add(endTimeBeginningOfDayISO);
+      }
     }
 
-    // set({
-    //   availableDateTimeIntervals: availableDateTimeIntervals,
-    // });
+    set({
+      availableDateTimeIntervals: datesAvailableForEvents,
+    });
 
-    return availableDateTimeIntervals;
+    return datesAvailableForEvents;
   },
 }));

@@ -26,8 +26,6 @@ export default function CustomWeekView({
     [date, localizer]
   );
 
-  const { availableDateTimeIntervals } = useAvailableSlotsStore();
-
   return (
     <TimeGrid
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -37,7 +35,7 @@ export default function CustomWeekView({
       localizer={localizer}
       max={max}
       min={min}
-      range={availableDateTimeIntervals || []}
+      range={currRange || []}
       scrollToTime={scrollToTime}
       {...props}
     />
@@ -46,18 +44,22 @@ export default function CustomWeekView({
 
 // handles what is shown for view....
 CustomWeekView.range = (date: Date, { localizer }: { localizer: any }) => {
-  const start = date;
-  const end = localizer.add(start, 25, "day");
+  const { availableDateTimeIntervals } = useAvailableSlotsStore();
 
-  let current = start;
-  const range = [];
+  console.log(availableDateTimeIntervals);
 
-  while (localizer.lte(current, end, "day")) {
-    range.push(current);
-    current = localizer.add(current, 5, "day");
-  }
+  //   const start = date;
+  //   const end = localizer.add(start, 25, "day");
 
-  return range;
+  //   let current = start;
+  //   const range = [];
+
+  //   while (localizer.lte(current, end, "day")) {
+  //     range.push(current);
+  //     current = localizer.add(current, 5, "day");
+  //   }
+
+  return availableDateTimeIntervals.slice(0, 5);
 };
 
 // handles how the component moves, both will need changes.
@@ -80,5 +82,5 @@ CustomWeekView.navigate = (
 
 CustomWeekView.title = (date: Date, options: TitleOptions) => {
   // console.log(options);
-  return "Hello World";
+  return `My awesome week: ${date.toLocaleDateString()}`;
 };

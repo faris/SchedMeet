@@ -205,6 +205,10 @@ export const MyCalendar = () => {
         scrollToTime={new Date()}
         components={{
           week: {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            header: ({ date, localizer }) =>
+              localizer.format(date, "E MM-dd-yy", "en-US"),
             event: WeekEventComponent,
           },
         }}
