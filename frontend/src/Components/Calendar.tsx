@@ -22,7 +22,7 @@ import {
   updateEventMutationFunction,
 } from "../service/mutation";
 import { getEventInformation } from "../service/query";
-import CustomWeekView from "./utility/customview";
+import { CustomWeekView } from "./utility/customview";
 import { useAvailableSlotsStore } from "../stores/availabilityStore";
 
 import { useMutation, useQuery, useQueryClient } from "react-query";
@@ -55,7 +55,8 @@ export const MyCalendar = () => {
     eventMetadata,
   } = useCalendarStore();
 
-  const { setAvailableDateTimeIntervals } = useAvailableSlotsStore();
+  const { setAvailableDateTimeIntervals, retrieveNavigatedActionDate } =
+    useAvailableSlotsStore();
 
   useEffect(() => {
     retrieveAuthToken();
@@ -197,6 +198,8 @@ export const MyCalendar = () => {
         style={{ height: "60vh" }}
         onEventDrop={moveEvent}
         step={15}
+        // Might be a hacky approach, just want something to work for now.
+        customNavigation={retrieveNavigatedActionDate}
         views={{
           month: true,
           week: CustomWeekView,
@@ -208,7 +211,7 @@ export const MyCalendar = () => {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             header: ({ date, localizer }) =>
-              localizer.format(date, "E MM-dd-yy", "en-US"),
+              localizer.format(date, "EEEE MM-dd-yy", "en-US"),
             event: WeekEventComponent,
           },
         }}

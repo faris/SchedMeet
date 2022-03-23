@@ -6,8 +6,7 @@ import { Navigate, NavigateAction, TitleOptions } from "react-big-calendar";
 import TimeGrid from "react-big-calendar/lib/TimeGrid";
 import { useAvailableSlotsStore } from "../../stores/availabilityStore";
 
-// TODO: Change to named function non-default
-export default function CustomWeekView({
+export const CustomWeekView = ({
   date,
   localizer,
   max = localizer.endOf(new Date(), "day"),
@@ -20,11 +19,13 @@ export default function CustomWeekView({
   max: Date;
   min: Date;
   scrollToTime: Date;
-}) {
-  const currRange = useMemo(
-    () => CustomWeekView.range(date, { localizer }),
-    [date, localizer]
-  );
+}) => {
+  const currRange = CustomWeekView.range(date, { localizer });
+
+  console.log(currRange);
+  if (currRange === []) {
+    return <></>;
+  }
 
   return (
     <TimeGrid
@@ -35,45 +36,40 @@ export default function CustomWeekView({
       localizer={localizer}
       max={max}
       min={min}
-      range={currRange || []}
+      range={currRange}
       scrollToTime={scrollToTime}
       {...props}
     />
   );
-}
+};
 
 // handles what is shown for view....
 CustomWeekView.range = (date: Date, { localizer }: { localizer: any }) => {
-  const { availableDateTimeIntervals } = useAvailableSlotsStore();
+  const { availableDateTimeIntervals, retrieveCurrentDateTimeIntervalIndex } =
+    useAvailableSlotsStore();
 
-  console.log(availableDateTimeIntervals);
+  const currentDateTimeIntervalIndex =
+    retrieveCurrentDateTimeIntervalIndex(date);
 
-  //   const start = date;
-  //   const end = localizer.add(start, 25, "day");
+  if (currentDateTimeIntervalIndex == -1) {
+    return [];
+  }
 
-  //   let current = start;
-  //   const range = [];
-
-  //   while (localizer.lte(current, end, "day")) {
-  //     range.push(current);
-  //     current = localizer.add(current, 5, "day");
-  //   }
-
-  return availableDateTimeIntervals.slice(0, 5);
+  return availableDateTimeIntervals.slice(
+    currentDateTimeIntervalIndex,
+    currentDateTimeIntervalIndex + 5
+  );
 };
 
-// handles how the component moves, both will need changes.
-CustomWeekView.navigate = (
-  date: Date,
-  action: NavigateAction,
-  { localizer }: { localizer: any }
-) => {
+CustomWeekView.navigate = (date: Date, action: NavigateAction, props: any) => {
+  console.log(props);
+
   switch (action) {
     case Navigate.PREVIOUS:
-      return localizer.add(date, -3, "day");
+      return props.customNavigation(date, action);
 
     case Navigate.NEXT:
-      return localizer.add(date, 3, "day");
+      return props.customNavigation(date, action);
 
     default:
       return date;
@@ -81,6 +77,10 @@ CustomWeekView.navigate = (
 };
 
 CustomWeekView.title = (date: Date, options: TitleOptions) => {
-  // console.log(options);
-  return `My awesome week: ${date.toLocaleDateString()}`;
+  console.log(options);
+  return `Showing days after: ${options.localizer.format(
+    date,
+    "EEEE MM-dd-yy",
+    "en-US"
+  )}`;
 };
