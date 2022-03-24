@@ -5,7 +5,6 @@ import { Navigate, NavigateAction, TitleOptions } from "react-big-calendar";
 // @ts-ignore
 import TimeGrid from "react-big-calendar/lib/TimeGrid";
 import { useAvailableSlotsStore } from "../../stores/availabilityStore";
-
 export const CustomWeekView = ({
   date,
   localizer,
@@ -21,11 +20,6 @@ export const CustomWeekView = ({
   scrollToTime: Date;
 }) => {
   const currRange = CustomWeekView.range(date, { localizer });
-
-  console.log(currRange);
-  if (currRange === []) {
-    return <></>;
-  }
 
   return (
     <TimeGrid
@@ -43,7 +37,7 @@ export const CustomWeekView = ({
   );
 };
 
-// handles what is shown for view....
+// handles what is shown for view, when the view only has one date, it breaks....
 CustomWeekView.range = (date: Date, { localizer }: { localizer: any }) => {
   const { availableDateTimeIntervals, retrieveCurrentDateTimeIntervalIndex } =
     useAvailableSlotsStore();
@@ -55,6 +49,8 @@ CustomWeekView.range = (date: Date, { localizer }: { localizer: any }) => {
     return [];
   }
 
+  console.log(currentDateTimeIntervalIndex);
+
   return availableDateTimeIntervals.slice(
     currentDateTimeIntervalIndex,
     currentDateTimeIntervalIndex + 5
@@ -62,8 +58,6 @@ CustomWeekView.range = (date: Date, { localizer }: { localizer: any }) => {
 };
 
 CustomWeekView.navigate = (date: Date, action: NavigateAction, props: any) => {
-  console.log(props);
-
   switch (action) {
     case Navigate.PREVIOUS:
       return props.customNavigation(date, action);
@@ -77,8 +71,7 @@ CustomWeekView.navigate = (date: Date, action: NavigateAction, props: any) => {
 };
 
 CustomWeekView.title = (date: Date, options: TitleOptions) => {
-  console.log(options);
-  return `Showing days after: ${options.localizer.format(
+  return `Showing days on/after: ${options.localizer.format(
     date,
     "EEEE MM-dd-yy",
     "en-US"

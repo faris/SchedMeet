@@ -201,9 +201,7 @@ export const MyCalendar = () => {
         // Might be a hacky approach, just want something to work for now.
         customNavigation={retrieveNavigatedActionDate}
         views={{
-          month: true,
           week: CustomWeekView,
-          day: true,
         }}
         scrollToTime={new Date()}
         components={{

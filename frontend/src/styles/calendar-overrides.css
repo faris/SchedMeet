@@ -3,3 +3,7 @@
   background-color: #3dcc4a !important;
   color: #fff;
 }
+
+.rbc-time-header-cell-single-day {
+  display: block !important;
+}
