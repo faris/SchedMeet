@@ -9,6 +9,7 @@ export const testAuthPath = `${baseURL}/auth/test`;
 export const calendarPath = `${baseURL}/calendar`;
 export const eventPath = `${baseURL}/event`;
 export const availabilityPath = `${baseURL}/availability`;
+
 interface SchedMeetMetadata {
   event_id: string;
   description?: string;
@@ -31,6 +32,13 @@ export interface SchedMeetNewEventRequest {
   title: string;
   description: string;
   availableDateTimeIntervals: Array<[Date, Date]>;
+}
+
+export interface SchedMeetNewEventResponse {
+  event_id: string;
+  event_title: string;
+  event_owner: string;
+  event_description: string;
 }
 
 export interface SchedMeetEvent extends CalendarEvent {

@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { Routes, Route, Link, Navigate } from "react-router-dom";
 import Stack from "@mui/material/Stack";
 import MenuItem from "@mui/material/MenuItem";
 import { useFormikContext, Formik, FormikContextType, Form } from "formik";
@@ -9,6 +10,7 @@ import "../styles/calendar-overrides.css";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import {
+  eventPath,
   EventTimeRestrictions,
   SchedMeetNewEventFormValues,
   timeZoneList,
@@ -18,6 +20,7 @@ import { useMutation } from "react-query";
 import { useAuthStore } from "../stores/authStore";
 import { useNewEventFormStore } from "../stores/newEventFormStore";
 import compareAsc from "date-fns/compareAsc";
+import { TextFieldCopy } from "../Components/utility/copyTextField";
 import { getTimeZones } from "@vvo/tzdb";
 
 const DatePickerField = (...props: any[]) => {
@@ -231,6 +234,23 @@ export const SignupForm = () => {
   const createNewEvent = useMutation(createNewEventMutation, {
     mutationKey: "createNewEvent",
   });
+
+  // TODO: spinner?
+  if (createNewEvent.isLoading) {
+    return <></>;
+  }
+
+  // TODO: alert modal?
+  if (createNewEvent.isError) {
+    return <TextFieldCopy></TextFieldCopy>;
+  }
+
+  if (createNewEvent.isSuccess) {
+    alert(`Event successfully created!`);
+    return (
+      <Navigate replace to={`/event/${createNewEvent.data.data.event_id}`} />
+    );
+  }
 
   return (
     <>
