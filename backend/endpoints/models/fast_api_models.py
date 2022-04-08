@@ -4,12 +4,9 @@ from typing import Optional, List, Tuple
 from datetime import datetime
 
 
-class CalendarEvent(BaseModel):
+class AvailabilitySlotRequest(BaseModel):
     event_id: str
-    event_title: str
-    event_start_time: str
-    event_end_time: str
-    description: Optional[str] = None
+    availability_interval: Tuple[datetime, datetime]
 
 
 class NewEventRequest(BaseModel):

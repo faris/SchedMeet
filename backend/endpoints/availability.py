@@ -1,7 +1,8 @@
 import calendar
-from fastapi import APIRouter, Depends, Request, HTTPException
+from uuid import uuid4
+from fastapi import APIRouter, Depends, HTTPException
 from dependency import authenticated_uid_check
-from .models.fast_api_models import CalendarEvent
+from .models.fast_api_models import AvailabilitySlotRequest
 from .models.relational_models import eventsPDB,eventToDateTable , engine
 from sqlalchemy.sql import select, update
 import logging
@@ -35,8 +36,27 @@ def get_events(event_id: str, user_id: str = Depends(authenticated_uid_check)):
     else:
         raise HTTPException(status_code=404, detail="Event not found")
 
+# Adds a new availability slot..
+@router.post("/new")
+def add_availability(availabilitySlot: AvailabilitySlotRequest, user_id: str = Depends(authenticated_uid_check)):
+    event_db_obj = {
+        "event_id": availabilitySlot.event_id,
+        "availability_id":  uuid4(),
+        "availability_owner": user_id,
+        "availability_interval": availabilitySlot.availability_interval, 
+    }
 
+    with engine.connect() as connection:
+        ins = eventsPDB.insert()
+        connection.execute(ins, event_db_obj)
 
+    event_obj = {
+        "title": event.event_title,
+        "start": event.event_start_time,
+        "end": event.event_end_time,
+        "resource": {"event_id": event.event_id},
+    }
+    return event_obj
 
 
 @router.get("/events/")
@@ -59,28 +79,7 @@ def get_events(user_id: str = Depends(authenticated_uid_check)):
     return events
 
 
-@router.post("/new")
-def create_event(event: CalendarEvent, user_id: str = Depends(authenticated_uid_check)):
-    event_db_obj = {
-        "event_id": event.event_id,
-        "event_title": event.event_title,
-        "event_owner": user_id,
-        "event_start_time": event.event_start_time,
-        "event_end_time": event.event_end_time,
-        "event_description": event.description,
-    }
 
-    with engine.connect() as connection:
-        ins = eventsPDB.insert()
-        connection.execute(ins, event_db_obj)
-
-    event_obj = {
-        "title": event.event_title,
-        "start": event.event_start_time,
-        "end": event.event_end_time,
-        "resource": {"event_id": event.event_id},
-    }
-    return event_obj
 
 
 @router.put("/update")

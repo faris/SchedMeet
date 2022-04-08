@@ -77,7 +77,8 @@ availabilityPDB = Table(
     metadata_object,
     Column("availability_id", String, primary_key=True),
     Column("event_id", String, ForeignKey("events.event_id")),
-    Column("event_attendee", String),
+    Column("availability_interval", TSTZRANGE, primary_key=True),
+    Column("availability_owner", String),
 )
 
 engine = create_engine(POSTGRES_CONNECTION_URL)
