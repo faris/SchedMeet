@@ -1,15 +1,16 @@
 import create from "zustand";
-import firebase from "firebase/compat/app";
-import { SchedMeetEvent, calendarPath, testTimesArray } from "../constants";
-import axios from "axios";
-import { useMutation } from "react-query";
+import {
+  SchedMeetEvent,
+  BookedTimeSlot,
+  convertBookedTimeSlotToSchedMeetEvent,
+} from "../constants";
 import { stringOrDate } from "react-big-calendar";
 
 interface CalendarState {
   userAvailabilitySlots: SchedMeetEvent[];
   eventTimeSlots: Array<[Date, Date]>;
   eventMetadata: { title: string; description: string };
-  addAvailabilitySlot: (event: SchedMeetEvent) => void;
+  addAvailabilitySlot: (booked_time_slot: BookedTimeSlot) => void;
   moveAvailabilitySlot: (
     calendarEvent: SchedMeetEvent,
     start: stringOrDate,
@@ -21,7 +22,7 @@ interface CalendarState {
     start: stringOrDate,
     end: stringOrDate
   ) => SchedMeetEvent | undefined;
-  setAvailabilitySlots: (calendarEvents: SchedMeetEvent[]) => void;
+  setAvailabilitySlots: (calendarEvents: BookedTimeSlot[]) => SchedMeetEvent[];
   setEventMetadata: (title: string, description: string) => void;
 }
 
@@ -30,14 +31,26 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
   eventMetadata: { title: "", description: "" },
   userAvailabilitySlots: [],
   eventTimeSlots: [],
+  addAvailabilitySlot: (booked_time_slot: BookedTimeSlot) => {
+    const convertedEvent =
+      convertBookedTimeSlotToSchedMeetEvent(booked_time_slot);
+    set({
+      userAvailabilitySlots: [...get().userAvailabilitySlots, convertedEvent],
+    });
+  },
   setEventMetadata: (title: string, description: string) => {
     set({ eventMetadata: { title: title, description: description } });
   },
-  addAvailabilitySlot: (event: SchedMeetEvent) => {
-    set({ userAvailabilitySlots: [...get().userAvailabilitySlots, event] });
-  },
-  setAvailabilitySlots: (calendarEvents: SchedMeetEvent[]) => {
-    set({ userAvailabilitySlots: calendarEvents });
+  setAvailabilitySlots: (calendarEvents: BookedTimeSlot[]) => {
+    const bookedSlots = [];
+
+    for (const bookedSlot of calendarEvents) {
+      const convertedEvent = convertBookedTimeSlotToSchedMeetEvent(bookedSlot);
+      bookedSlots.push(convertedEvent);
+    }
+
+    set({ userAvailabilitySlots: bookedSlots });
+    return bookedSlots;
   },
   moveAvailabilitySlot: (
     event: SchedMeetEvent,

@@ -1,10 +1,13 @@
 import axios from "axios";
+import { Event as CalendarEvent } from "react-big-calendar";
+
 import {
   calendarPath,
   SchedMeetEvent,
   eventPath,
   SchedMeetNewEventRequest,
   SchedMeetNewEventResponse,
+  availabilityPath,
 } from "../constants";
 
 export const createNewEventMutation = ({
@@ -34,16 +37,14 @@ export const addEventMutationFunction = ({
   newEvent,
   authToken,
 }: {
-  newEvent: SchedMeetEvent;
+  newEvent: CalendarEvent;
   authToken: string;
 }) => {
   return axios.post<SchedMeetEvent>(
-    `${calendarPath}/new`,
+    `${availabilityPath}/new`,
     {
       event_id: newEvent.resource?.event_id,
-      event_title: newEvent.title,
-      event_start_time: newEvent.start,
-      event_end_time: newEvent.end,
+      event_availability_interval: [newEvent.start, newEvent.end],
     },
     {
       headers: {
@@ -63,7 +64,6 @@ export const updateEventMutationFunction = ({
   return axios.put<SchedMeetEvent>(
     `${calendarPath}/update`,
     {
-      event_id: movedEvent.resource?.event_id,
       event_title: movedEvent.title,
       event_start_time: movedEvent.start,
       event_end_time: movedEvent.end,

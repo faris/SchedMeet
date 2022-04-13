@@ -6,7 +6,7 @@ from datetime import datetime
 
 class AvailabilitySlotRequest(BaseModel):
     event_id: str
-    availability_interval: Tuple[datetime, datetime]
+    event_availability_interval: Tuple[datetime, datetime]
 
 
 class NewEventRequest(BaseModel):

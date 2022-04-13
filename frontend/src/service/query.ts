@@ -1,5 +1,5 @@
 import axios from "axios";
-import { availabilityPath, SchedMeetNewEventRequest } from "../constants";
+import { availabilityPath, BookedTimeSlot } from "../constants";
 
 export const getEventInformation = async (
   authToken: string,
@@ -9,6 +9,7 @@ export const getEventInformation = async (
     event_title: string;
     event_description: string;
     availableDateTimeIntervals: Array<[string, string]>;
+    booked_slots: Array<BookedTimeSlot>;
   }>(`${availabilityPath}/${event_id}`, {
     headers: {
       Authorization: `Bearer ${authToken}`,

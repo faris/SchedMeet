@@ -12,7 +12,7 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import withDragAndDrop, {
   withDragAndDropProps,
 } from "react-big-calendar/lib/addons/dragAndDrop";
-import { SchedMeetEvent, testTimesArray } from "../constants";
+import { SchedMeetEvent } from "../constants";
 import { v4 as uuidv4 } from "uuid";
 import { stringOrDate } from "react-big-calendar";
 import { useCalendarStore } from "../stores/eventStore";
@@ -48,7 +48,6 @@ export const MyCalendar = () => {
   const {
     setAvailabilitySlots,
     userAvailabilitySlots,
-    addAvailabilitySlot,
     moveAvailabilitySlot,
     resizeAvailabilitySlot,
     setEventMetadata,
@@ -76,8 +75,9 @@ export const MyCalendar = () => {
           response.data.event_title,
           response.data.event_description
         );
+        setAvailabilitySlots(response.data.booked_slots);
       },
-      staleTime: 300000,
+
       enabled: !!authToken && event_id !== undefined,
     }
   );
@@ -147,25 +147,25 @@ export const MyCalendar = () => {
   const onSelectSlot = (slotInfo: SlotInfo) => {
     const title = window.prompt("New Event Name");
 
-    if (title) {
+    if (title && event_id) {
       const newEvent = {
         start: slotInfo.start as Date,
         end: slotInfo.end as Date,
-        resource: { event_id: uuidv4() },
+        resource: { event_id },
         title: title,
       };
       addEventMutation.mutate(
         { newEvent, authToken },
         {
           onError: () => {
-            queryClient.invalidateQueries(["fetchCalendarEvents"]);
+            // queryClient.invalidateQueries(["fetchCalendarEvents"]);
             alert(
               `ERROR: Event ${newEvent.title} did not go through, please try again`
             );
           },
         }
       );
-      addAvailabilitySlot(newEvent);
+      queryClient.invalidateQueries(["fetchCalendarEvents"]);
     }
   };
 

@@ -1,5 +1,5 @@
 import { Event as CalendarEvent } from "react-big-calendar";
-import { startOfYesterday, endOfTomorrow, addWeeks, addHours } from "date-fns";
+import { parseISO } from "date-fns";
 export const baseURL =
   !process.env.NODE_ENV || process.env.NODE_ENV === "development"
     ? `http://localhost:8000`
@@ -11,8 +11,16 @@ export const eventPath = `${baseURL}/event`;
 export const availabilityPath = `${baseURL}/availability`;
 
 interface SchedMeetMetadata {
-  event_id: string;
-  description?: string;
+  availability_id: string;
+  availability_owner: string;
+  event_id?: string;
+}
+
+// This is the interface that represents slots that have been booked by a user
+export interface BookedTimeSlot {
+  availability_id: string;
+  availability_owner: string;
+  availability_interval: [string, string];
 }
 
 export interface EventTimeRestrictions {
@@ -45,22 +53,19 @@ export interface SchedMeetEvent extends CalendarEvent {
   resource?: SchedMeetMetadata;
 }
 
-export const testTimesArray: SchedMeetEvent[] = [
-  {
-    title: "Mock Event 1",
-    start: startOfYesterday(),
-    end: endOfTomorrow(),
-    allDay: true,
-    resource: { event_id: "1" },
-  },
-  {
-    title: "Mock Event 2",
-    start: addWeeks(startOfYesterday(), 1),
-    end: addHours(addWeeks(startOfYesterday(), 1), 7),
-    allDay: false,
-    resource: { event_id: "2" },
-  },
-];
+export const convertBookedTimeSlotToSchedMeetEvent = (
+  booked_time_slot: BookedTimeSlot
+) => {
+  const convertedEvent: SchedMeetEvent = {
+    start: parseISO(booked_time_slot.availability_interval[0]),
+    end: parseISO(booked_time_slot.availability_interval[1]),
+    resource: {
+      availability_id: booked_time_slot.availability_id,
+      availability_owner: booked_time_slot.availability_owner,
+    },
+  };
+  return convertedEvent;
+};
 
 export const timeZoneList = [
   { offset: "-11:00", label: "(GMT-11:00) Niue", tzCode: "Pacific/Niue" },
