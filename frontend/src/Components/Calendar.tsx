@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
+import "../styles/calendar-overrides.css";
 import { Routes, Route, useParams } from "react-router-dom";
 import { Calendar, dateFnsLocalizer, SlotInfo } from "react-big-calendar";
 import { WeekEventComponent } from "../Components/EventComponent";
+import { HeatMapGrid } from "react-grid-heatmap";
 import format from "date-fns/format";
 import parse from "date-fns/parse";
 import startOfWeek from "date-fns/startOfWeek";
@@ -12,20 +14,15 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import withDragAndDrop, {
   withDragAndDropProps,
 } from "react-big-calendar/lib/addons/dragAndDrop";
-import { SchedMeetEvent } from "../constants";
-import { v4 as uuidv4 } from "uuid";
-import { stringOrDate } from "react-big-calendar";
+import HeatMap from "@uiw/react-heat-map";
 import { useCalendarStore } from "../stores/eventStore";
 import { useAuthStore } from "../stores/authStore";
-import {
-  addEventMutationFunction,
-  updateEventMutationFunction,
-} from "../service/mutation";
+
 import { getEventInformation } from "../service/query";
-import { CustomWeekView } from "./utility/customview";
+
 import { useAvailableSlotsStore } from "../stores/availabilityStore";
 
-import { useMutation, useQuery, useQueryClient } from "react-query";
+import { useQuery, useQueryClient } from "react-query";
 // https://github.com/jquense/react-big-calendar/issues/1842
 // TODO: Investigate fix later
 const DragAndDropCalendar = withDragAndDrop(Calendar as any);
@@ -45,17 +42,13 @@ const localizer = dateFnsLocalizer({
 export const MyCalendar = () => {
   const { authToken, retrieveAuthToken } = useAuthStore();
   const { event_id } = useParams();
-  const {
-    setAvailabilitySlots,
-    userAvailabilitySlots,
-    moveAvailabilitySlot,
-    resizeAvailabilitySlot,
-    setEventMetadata,
-    eventMetadata,
-  } = useCalendarStore();
+  const { setEventMetadata, eventMetadata } = useCalendarStore();
 
-  const { setAvailableDateTimeIntervals, retrieveNavigatedActionDate } =
-    useAvailableSlotsStore();
+  const {
+    setAvailableDateTimeIntervals,
+    availableDateTimeIntervals,
+    availableTimeSlots,
+  } = useAvailableSlotsStore();
 
   useEffect(() => {
     retrieveAuthToken();
@@ -75,144 +68,50 @@ export const MyCalendar = () => {
           response.data.event_title,
           response.data.event_description
         );
-        setAvailabilitySlots(response.data.booked_slots);
       },
 
       enabled: !!authToken && event_id !== undefined,
     }
   );
 
-  const addEventMutation = useMutation(addEventMutationFunction, {
-    mutationKey: "addNewEvent",
-  });
+  const xLabels = availableDateTimeIntervals.map(
+    (date) => `${format(date, "EEEE MM-dd-yy")}`
+  );
+  const yLabels = availableTimeSlots;
 
-  const updateEventMutation = useMutation(updateEventMutationFunction, {
-    mutationKey: "updateExistingEvent",
-  });
+  console.log(xLabels, yLabels);
 
-  const moveEvent: withDragAndDropProps["onEventResize"] = ({
-    event,
-    start,
-    end,
-    isAllDay,
-  }: {
-    event: SchedMeetEvent;
-    start: stringOrDate;
-    end: stringOrDate;
-    isAllDay: boolean;
-  }) => {
-    const movedEvent = moveAvailabilitySlot(event, start, end, isAllDay);
-
-    if (movedEvent) {
-      updateEventMutation.mutate(
-        { movedEvent, authToken },
-        {
-          onError: () => {
-            queryClient.invalidateQueries(["fetchCalendarEvents"]);
-            alert(
-              `ERROR: Moving of event ${movedEvent.title} did not go through, please try again`
-            );
-          },
-        }
-      );
-    }
-  };
-
-  const resizeEvent = ({
-    event,
-    start,
-    end,
-  }: {
-    event: SchedMeetEvent;
-    start: stringOrDate;
-    end: stringOrDate;
-  }) => {
-    const resizedCalendarEvent = resizeAvailabilitySlot(event, start, end);
-
-    if (resizedCalendarEvent) {
-      updateEventMutation.mutate(
-        { movedEvent: resizedCalendarEvent, authToken },
-        {
-          onError: () => {
-            queryClient.invalidateQueries(["fetchCalendarEvents"]);
-            alert(
-              `ERROR: Resizing of event ${resizedCalendarEvent.title} did not go through, please try again`
-            );
-          },
-        }
-      );
-    }
-  };
-
-  const onSelectSlot = (slotInfo: SlotInfo) => {
-    const title = window.prompt("New Event Name");
-
-    if (title && event_id) {
-      const newEvent = {
-        start: slotInfo.start as Date,
-        end: slotInfo.end as Date,
-        resource: { event_id },
-        title: title,
-      };
-      addEventMutation.mutate(
-        { newEvent, authToken },
-        {
-          onError: () => {
-            // queryClient.invalidateQueries(["fetchCalendarEvents"]);
-            alert(
-              `ERROR: Event ${newEvent.title} did not go through, please try again`
-            );
-          },
-        }
-      );
-      queryClient.invalidateQueries(["fetchCalendarEvents"]);
-    }
-  };
-
-  if (fetchCalendarEvents.isLoading) {
-    return <span>Loading...</span>;
-  }
-
-  if (fetchCalendarEvents.isError) {
-    return <span>Error: {fetchCalendarEvents.error}</span>;
-  }
-
-  console.log(eventMetadata);
+  const data = new Array(yLabels.length)
+    .fill(0)
+    .map(() =>
+      new Array(xLabels.length)
+        .fill(0)
+        .map(() => Math.floor(Math.random() * 50 + 50))
+    );
 
   return (
     <>
       <h1>{eventMetadata.title}</h1>
       <p>{eventMetadata.description}</p>
-      <DragAndDropCalendar
-        localizer={localizer}
-        events={userAvailabilitySlots}
-        startAccessor="start"
-        endAccessor="end"
-        selectable
-        resizable
-        showMultiDayTimes
-        onEventResize={resizeEvent}
-        defaultView={"week"}
-        onSelectSlot={onSelectSlot}
-        onSelectEvent={(event) => alert(event.title)}
-        style={{ height: "60vh" }}
-        onEventDrop={moveEvent}
-        step={15}
-        // Might be a hacky approach, just want something to work for now.
-        customNavigation={retrieveNavigatedActionDate}
-        views={{
-          week: CustomWeekView,
-        }}
-        scrollToTime={new Date()}
-        components={{
-          week: {
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            header: ({ date, localizer }) =>
-              localizer.format(date, "EEEE MM-dd-yy", "en-US"),
-            event: WeekEventComponent,
-          },
-        }}
+      <HeatMapGrid
+        data={data}
+        xLabels={xLabels}
+        yLabels={yLabels}
+        // Reder cell with tooltip
+        cellRender={(x, y, value) => (
+          <div title={`Pos(${x}, ${y}) = ${value}`}>{value}</div>
+        )}
+        cellStyle={(_x, _y, ratio) => ({
+          background: `rgb(12, 160, 44, ${ratio})`,
+          fontSize: ".8rem",
+          color: `rgb(0, 0, 0, ${ratio / 2 + 0.4})`,
+          width: `6rem`,
+          flex: `0 0 6rem`,
+        })}
+        cellHeight="3rem"
+        xLabelsPos="top"
+        onClick={(x, y) => alert(`Clicked (${x}, ${y})`)}
+        square={false}
       />
     </>
   );

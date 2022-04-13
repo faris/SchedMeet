@@ -1,5 +1,5 @@
 import create from "zustand";
-import { startOfDay, parseISO, compareAsc } from "date-fns";
+import { startOfDay, parseISO, compareAsc, format, addMinutes } from "date-fns";
 import { Navigate, NavigateAction, TitleOptions } from "react-big-calendar";
 import { devtools } from "zustand/middleware";
 import addMilliseconds from "date-fns/addMilliseconds";
@@ -7,6 +7,7 @@ import addMilliseconds from "date-fns/addMilliseconds";
 
 interface AvailabilityState {
   availableDateTimeIntervals: Array<Date>;
+  availableTimeSlots: Array<string>;
   setAvailableDateTimeIntervals: (
     availableDateTimeIntervals: Array<[string, string]>
   ) => Array<Date>;
@@ -17,12 +18,24 @@ interface AvailabilityState {
 export const useAvailableSlotsStore = create<AvailabilityState>(
   devtools((set, get) => ({
     availableDateTimeIntervals: [],
+    availableTimeSlots: [],
     setAvailableDateTimeIntervals: (
       availableDateTimeIntervals: Array<[string, string]>
     ) => {
       const datesAvailableForEvents = [];
+      const timeSlots: Array<string> = [];
       const seenDates = new Set();
       const currentTime = new Date();
+
+      if (availableDateTimeIntervals.length > 0) {
+        let startTime = parseISO(availableDateTimeIntervals[0][0]);
+        const endTime = parseISO(availableDateTimeIntervals[0][1]);
+
+        while (compareAsc(startTime, endTime) == -1) {
+          timeSlots.push(format(startTime, "H:mm"));
+          startTime = addMinutes(startTime, 15);
+        }
+      }
 
       for (const date of availableDateTimeIntervals) {
         const startTime = parseISO(date[0]);
@@ -49,6 +62,7 @@ export const useAvailableSlotsStore = create<AvailabilityState>(
 
       set({
         availableDateTimeIntervals: nonExpiredEvents,
+        availableTimeSlots: timeSlots,
       });
 
       return datesAvailableForEvents;
