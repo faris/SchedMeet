@@ -1,14 +1,4 @@
-.react-datepicker__day--highlighted {
-  border-radius: 0.3rem;
-  background-color: #3dcc4a !important;
-  color: #fff;
-}
-
-.rbc-time-header-cell-single-day {
-  display: block !important;
-}
-
-/* Super hacky, need something quick*/
-#root > div:nth-child(3) > div:nth-child(1) {
-  margin-top: 3rem;
+/* Super hacky, this aligns the y axis with the grid*/
+.meeting-grid > div:nth-child(1) > div:nth-child(1) {
+  margin-top: 3rem !important;
 }

@@ -39,7 +39,7 @@ export interface SchedMeetNewEventFormValues {
 export interface SchedMeetNewEventRequest {
   title: string;
   description: string;
-  availableDateTimeIntervals: Array<[Date, Date]>;
+  availableDateTimeIntervals: Array<Date>;
 }
 
 export interface SchedMeetNewEventResponse {

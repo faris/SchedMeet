@@ -1,43 +1,17 @@
 import React, { useState, useEffect } from "react";
 import "../styles/calendar-overrides.css";
-import { Routes, Route, useParams } from "react-router-dom";
-import { Calendar, dateFnsLocalizer, SlotInfo } from "react-big-calendar";
-import { WeekEventComponent } from "../Components/EventComponent";
+import { useParams } from "react-router-dom";
 import { HeatMapGrid } from "react-grid-heatmap";
 import format from "date-fns/format";
-import parse from "date-fns/parse";
-import startOfWeek from "date-fns/startOfWeek";
-import getDay from "date-fns/getDay";
+
 import enUS from "date-fns/locale/en-US";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import withDragAndDrop, {
-  withDragAndDropProps,
-} from "react-big-calendar/lib/addons/dragAndDrop";
-import HeatMap from "@uiw/react-heat-map";
 import { useCalendarStore } from "../stores/eventStore";
 import { useAuthStore } from "../stores/authStore";
-
 import { getEventInformation } from "../service/query";
-
 import { useAvailableSlotsStore } from "../stores/availabilityStore";
-
 import { useQuery, useQueryClient } from "react-query";
-// https://github.com/jquense/react-big-calendar/issues/1842
-// TODO: Investigate fix later
-const DragAndDropCalendar = withDragAndDrop(Calendar as any);
-
-const locales = {
-  "en-US": enUS,
-};
-
-const localizer = dateFnsLocalizer({
-  format,
-  parse,
-  startOfWeek,
-  getDay,
-  locales,
-});
 
 export const MyCalendar = () => {
   const { authToken, retrieveAuthToken } = useAuthStore();
@@ -45,7 +19,7 @@ export const MyCalendar = () => {
   const { setEventMetadata, eventMetadata } = useCalendarStore();
 
   const {
-    setAvailableDateTimeIntervals,
+    setAvailableDateTimeSlots,
     availableDateTimeIntervals,
     availableTimeSlots,
   } = useAvailableSlotsStore();
@@ -63,7 +37,7 @@ export const MyCalendar = () => {
     () => getEventInformation(authToken, event_id || ""),
     {
       onSuccess: (response) => {
-        setAvailableDateTimeIntervals(response.data.availableDateTimeIntervals);
+        setAvailableDateTimeSlots(response.data.availableTimeSlots);
         setEventMetadata(
           response.data.event_title,
           response.data.event_description
@@ -93,26 +67,33 @@ export const MyCalendar = () => {
     <>
       <h1>{eventMetadata.title}</h1>
       <p>{eventMetadata.description}</p>
-      <HeatMapGrid
-        data={data}
-        xLabels={xLabels}
-        yLabels={yLabels}
-        // Reder cell with tooltip
-        cellRender={(x, y, value) => (
-          <div title={`Pos(${x}, ${y}) = ${value}`}>{value}</div>
-        )}
-        cellStyle={(_x, _y, ratio) => ({
-          background: `rgb(12, 160, 44, ${ratio})`,
-          fontSize: ".8rem",
-          color: `rgb(0, 0, 0, ${ratio / 2 + 0.4})`,
-          width: `6rem`,
-          flex: `0 0 6rem`,
-        })}
-        cellHeight="3rem"
-        xLabelsPos="top"
-        onClick={(x, y) => alert(`Clicked (${x}, ${y})`)}
-        square={false}
-      />
+      <div className="meeting-grid">
+        <HeatMapGrid
+          data={data}
+          xLabels={xLabels}
+          yLabels={yLabels}
+          // Reder cell with tooltip
+          cellRender={(x, y, value) => (
+            <div
+              style={{ outlineStyle: "dashed" }}
+              title={`Pos(${x}, ${y}) = ${value}`}
+            >
+              {value}
+            </div>
+          )}
+          cellStyle={(_x, _y, ratio) => ({
+            background: `rgb(12, 160, 44, ${ratio})`,
+            fontSize: ".8rem",
+            color: `rgb(0, 0, 0, ${ratio / 2 + 0.4})`,
+            width: `6rem`,
+            flex: `0 0 6rem`,
+          })}
+          cellHeight="3rem"
+          xLabelsPos="top"
+          onClick={(x, y) => alert(`Clicked (${x}, ${y})`)}
+          square={false}
+        />
+      </div>
     </>
   );
 };

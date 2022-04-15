@@ -4,11 +4,12 @@ import {
   addDays,
   differenceInDays,
   addHours,
+  addMinutes,
   getHours,
   getMinutes,
 } from "date-fns";
-import { zonedTimeToUtc } from "date-fns-tz";
-import { addMinutes } from "date-fns/esm";
+import { generateAllTimeSlots } from "../helpers/timeUtils";
+
 // todo: add timezone
 // strip hour and minute from restrictedTimeInterval (timepicker)
 // strip year, month, day from selectedDates (datepicker)
@@ -25,8 +26,7 @@ interface NewEventFormInterface {
 
   timeZone: string;
   updateTimeZone: (timezone: string) => string;
-
-  prepareInterval: () => Array<[Date, Date]>;
+  prepareInterval: () => Array<Date>;
 }
 
 // locally manages state, to get rid of input delay that appears on inserting events
@@ -71,43 +71,17 @@ export const useNewEventFormStore = create<NewEventFormInterface>(
       set({
         timeZone: timezone,
       });
-      return "";
+      return timezone;
     },
-    // TODO using date-fns-tz
+
     prepareInterval: () => {
       const { timeZone, restrictedTimeInterval, selectedDates } = get();
 
-      const arr = [];
-
-      const getHoursAndMinutes = (date: Date) => {
-        return [getHours(date), getMinutes(date)];
-      };
-
-      const upgradeDateToDateTime = (time: Date, dateTime: Date) => {
-        const [hours, minutes] = getHoursAndMinutes(dateTime);
-        return addHours(addMinutes(time, minutes), hours);
-      };
-
-      const convertDateToDateTimeInterval = (
-        date: Date,
-        interval: [Date, Date],
-        timezone: string
-      ) => {
-        const startTime = zonedTimeToUtc(
-          upgradeDateToDateTime(date, interval[0]),
-          timezone
-        );
-        const endTime = zonedTimeToUtc(
-          upgradeDateToDateTime(date, interval[1]),
-          timezone
-        );
-
-        return [startTime, endTime] as [Date, Date];
-      };
+      let arr: Array<Date> = [];
 
       for (const date of selectedDates.values()) {
-        arr.push(
-          convertDateToDateTimeInterval(date, restrictedTimeInterval, timeZone)
+        arr = arr.concat(
+          generateAllTimeSlots(date, restrictedTimeInterval, timeZone)
         );
       }
 

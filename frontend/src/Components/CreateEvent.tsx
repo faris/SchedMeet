@@ -147,7 +147,7 @@ const TimePickerField = (...props: any[]) => {
         filterTime={filterTimeForNoEarlier}
         showTimeSelect
         showTimeSelectOnly
-        timeIntervals={15}
+        timeIntervals={30}
         timeCaption="Time"
         dateFormat="h:mm aa"
       />
@@ -177,7 +177,7 @@ const TimePickerField = (...props: any[]) => {
         }}
         showTimeSelect
         showTimeSelectOnly
-        timeIntervals={15}
+        timeIntervals={30}
         timeCaption="Time"
         dateFormat="h:mm aa"
       />
@@ -277,9 +277,7 @@ export const SignupForm = () => {
           noLaterThenTime: restrictedTimeInterval[1],
         }}
         validationSchema={Yup.object({
-          title: Yup.string()
-            .max(15, "Must be 15 characters or less")
-            .required("Required"),
+          title: Yup.string().required("Required"),
           description: Yup.string().required("Required"),
           timezone: Yup.string().required(),
           availableDateTimeIntervals: Yup.array().min(1),

@@ -23,7 +23,7 @@ export const createNewEventMutation = ({
     {
       event_title: newEvent.title,
       event_description: newEvent.description,
-      datetime_intervals: newEvent.availableDateTimeIntervals,
+      datetime_slots: newEvent.availableDateTimeIntervals,
     },
     {
       headers: {

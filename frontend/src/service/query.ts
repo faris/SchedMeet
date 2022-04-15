@@ -8,7 +8,7 @@ export const getEventInformation = async (
   const result = await axios.get<{
     event_title: string;
     event_description: string;
-    availableDateTimeIntervals: Array<[string, string]>;
+    availableTimeSlots: Array<string>;
     booked_slots: Array<BookedTimeSlot>;
   }>(`${availabilityPath}/${event_id}`, {
     headers: {
