@@ -44,7 +44,7 @@ export const addEventMutationFunction = ({
     `${availabilityPath}/new`,
     {
       event_id: newEvent.resource?.event_id,
-      event_availability_interval: [newEvent.start, newEvent.end],
+      event_availability_slot: [newEvent.start, newEvent.end],
     },
     {
       headers: {

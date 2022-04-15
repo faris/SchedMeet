@@ -19,9 +19,11 @@ export const MyCalendar = () => {
   const { setEventMetadata, eventMetadata } = useCalendarStore();
 
   const {
-    setAvailableDateTimeSlots,
-    availableDateTimeIntervals,
-    availableTimeSlots,
+    setBookableDateTimeSlots,
+    bookableDates,
+    bookableTimeSlots,
+    setGridMapMetaData,
+    gridMapMetaData,
   } = useAvailableSlotsStore();
 
   useEffect(() => {
@@ -37,30 +39,29 @@ export const MyCalendar = () => {
     () => getEventInformation(authToken, event_id || ""),
     {
       onSuccess: (response) => {
-        setAvailableDateTimeSlots(response.data.availableTimeSlots);
+        setBookableDateTimeSlots(response.data.availableTimeSlots);
         setEventMetadata(
           response.data.event_title,
           response.data.event_description
         );
+        setGridMapMetaData();
       },
 
       enabled: !!authToken && event_id !== undefined,
     }
   );
 
-  const xLabels = availableDateTimeIntervals.map(
+  const xLabels = bookableDates.map(
     (date) => `${format(date, "EEEE MM-dd-yy")}`
   );
-  const yLabels = availableTimeSlots;
-
-  console.log(xLabels, yLabels);
+  const yLabels = bookableTimeSlots;
 
   const data = new Array(yLabels.length)
     .fill(0)
     .map(() =>
       new Array(xLabels.length)
         .fill(0)
-        .map(() => Math.floor(Math.random() * 50 + 50))
+        .map(() => Math.floor(Math.random() * 10))
     );
 
   return (
@@ -76,7 +77,9 @@ export const MyCalendar = () => {
           cellRender={(x, y, value) => (
             <div
               style={{ outlineStyle: "dashed" }}
-              title={`Pos(${x}, ${y}) = ${value}`}
+              title={`(${x}, ${y}) = ${JSON.stringify(
+                gridMapMetaData.get(`(${x},${y})`)
+              )}`}
             >
               {value}
             </div>
@@ -86,12 +89,11 @@ export const MyCalendar = () => {
             fontSize: ".8rem",
             color: `rgb(0, 0, 0, ${ratio / 2 + 0.4})`,
             width: `6rem`,
-            flex: `0 0 6rem`,
+            flex: `1 1 6rem`,
           })}
           cellHeight="3rem"
           xLabelsPos="top"
           onClick={(x, y) => alert(`Clicked (${x}, ${y})`)}
-          square={false}
         />
       </div>
     </>
