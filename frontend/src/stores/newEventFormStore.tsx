@@ -26,7 +26,7 @@ interface NewEventFormInterface {
 
   timeZone: string;
   updateTimeZone: (timezone: string) => string;
-  prepareInterval: () => Array<Date>;
+  prepareInterval: () => Array<string>;
 }
 
 // locally manages state, to get rid of input delay that appears on inserting events
@@ -77,7 +77,7 @@ export const useNewEventFormStore = create<NewEventFormInterface>(
     prepareInterval: () => {
       const { timeZone, restrictedTimeInterval, selectedDates } = get();
 
-      let arr: Array<Date> = [];
+      let arr: Array<string> = [];
 
       for (const date of selectedDates.values()) {
         arr = arr.concat(

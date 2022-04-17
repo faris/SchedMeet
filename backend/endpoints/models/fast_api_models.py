@@ -12,4 +12,4 @@ class AvailabilitySlotRequest(BaseModel):
 class NewEventRequest(BaseModel):
     event_title: str
     event_description: str
-    datetime_intervals: List[Tuple[datetime, datetime]]
+    datetime_slots: List[str]

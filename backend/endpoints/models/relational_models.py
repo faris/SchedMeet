@@ -1,3 +1,4 @@
+import os
 from sqlalchemy import (
     create_engine,
     Table,
@@ -5,14 +6,9 @@ from sqlalchemy import (
     Integer,
     String,
     MetaData,
+    DateTime,
     ForeignKey,
 )
-
-from sqlalchemy.dialects.postgresql import TSTZRANGE
-
-import os
-
-
 POSTGRES_CONNECTION_URL = os.environ.get("POSTGRES_CONN_STRING", None)
 
 
@@ -37,10 +33,10 @@ eventsPDB = Table(
 )
 
 eventToDateTable = Table(
-    "event_time_ranges",
+    "event_time_slots",
     metadata_object,
     Column("event_id", String, ForeignKey("events.event_id"), primary_key=True),
-    Column("event_datetime_interval", TSTZRANGE, primary_key=True),
+    Column("event_datetime_slot", String, primary_key=True),
 )
 
 """Invitee set up table
@@ -77,7 +73,7 @@ availabilityPDB = Table(
     metadata_object,
     Column("availability_id", String, primary_key=True),
     Column("event_id", String, ForeignKey("events.event_id")),
-    Column("availability_interval", TSTZRANGE, primary_key=True),
+    Column("availability_slot", String, primary_key=True),
     Column("availability_owner", String),
 )
 

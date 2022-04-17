@@ -15,11 +15,10 @@ router = APIRouter()
 def create_event(
     new_event: NewEventRequest, user_id: str = Depends(authenticated_uid_check)
 ):
-    log = logging.getLogger("uvicorn.access")
 
     event_id = uuid4()
 
-    event_date_time_intervals = []
+    event_date_time_slots = []
 
     eventMetaDataObj = {
         "event_id": event_id,
@@ -28,17 +27,16 @@ def create_event(
         "event_description": new_event.event_description,
     }
 
-    for event in new_event.datetime_intervals:
-        event_date_time_intervals.append(
+    for timeslot in new_event.datetime_slots:
+        event_date_time_slots.append(
             {
                 "event_id": event_id,
-                "event_datetime_interval": DateTimeTZRange(event[0], event[1]),
+                "event_datetime_slot": timeslot,
             }
         )
 
     with engine.connect() as connection:
-
         connection.execute(eventsPDB.insert(), eventMetaDataObj)
-        connection.execute(eventToDateTable.insert(), event_date_time_intervals)
+        connection.execute(eventToDateTable.insert(), event_date_time_slots)
 
     return eventMetaDataObj

@@ -1,5 +1,6 @@
 import calendar
 from uuid import uuid4
+import datetime
 from fastapi import APIRouter, Depends, HTTPException
 from dependency import authenticated_uid_check
 from .models.fast_api_models import AvailabilitySlotRequest
@@ -15,28 +16,28 @@ router = APIRouter()
 def get_events(event_id: str, user_id: str = Depends(authenticated_uid_check)):
     
     
-    title, description, availableTimeFrames, reservedSlots = None, None, [], []
+    title, description, availableTimeSlots, reservedSlots = None, None, [], []
 
     with engine.connect() as connection:
         availableTimeSlotsJoinedTable = eventsPDB.join(eventToDateTable, eventToDateTable.c.event_id == eventsPDB.c.event_id )
-        availableTimeSlotsQuery = select([eventsPDB.c.event_title, eventsPDB.c.event_description,eventToDateTable.c.event_datetime_interval]).select_from(availableTimeSlotsJoinedTable).where(eventsPDB.c.event_id == event_id)
+        availableTimeSlotsQuery = select([eventsPDB.c.event_title, eventsPDB.c.event_description,eventToDateTable.c.event_datetime_slot]).select_from(availableTimeSlotsJoinedTable).where(eventsPDB.c.event_id == event_id)
         availableTimeSlotsResult = connection.execute(availableTimeSlotsQuery).fetchall()
         
     for row in availableTimeSlotsResult:
-        availableTimeFrames.append((row[2].lower.isoformat(),row[2].upper.isoformat()))
+        availableTimeSlots.append(row[2])
         title, description = row[0], row[1]
 
 
     with engine.connect() as connection:
         bookedTimeSlotsJoinedTable = eventsPDB.join(availabilityPDB, availabilityPDB.c.event_id == eventsPDB.c.event_id )
-        bookedTimeSlotsQuery = select([availabilityPDB.c.availability_id,availabilityPDB.c.availability_owner, availabilityPDB.c.availability_interval ]).select_from(bookedTimeSlotsJoinedTable).where(eventsPDB.c.event_id == event_id)
+        bookedTimeSlotsQuery = select([availabilityPDB.c.availability_id,availabilityPDB.c.availability_slot, availabilityPDB.c.availability_slot ]).select_from(bookedTimeSlotsJoinedTable).where(eventsPDB.c.event_id == event_id)
         bookedTimeSlotsResult = connection.execute(bookedTimeSlotsQuery).fetchall()
         
     for row in bookedTimeSlotsResult:
         bookedEvent = {
             "availability_id": row[0],
             "availability_owner": row[1],
-            "availability_interval": (row[2].lower.isoformat(),row[2].upper.isoformat())
+            "availability_slot": row[2]
         }
         reservedSlots.append(bookedEvent)
 
@@ -45,11 +46,12 @@ def get_events(event_id: str, user_id: str = Depends(authenticated_uid_check)):
         "event_id": event_id,
         "event_title": title,
         "event_description": description,
-        "availableDateTimeIntervals" : availableTimeFrames,
+        "availableTimeSlots" : availableTimeSlots,
         "booked_slots": reservedSlots
     }
     else:
         raise HTTPException(status_code=404, detail="Event not found")
+
 
 # Adds a new availability slot..
 @router.post("/new")

@@ -4,6 +4,7 @@ import {
   addHours,
   getHours,
   getMinutes,
+  formatISO,
 } from "date-fns";
 
 import { zonedTimeToUtc } from "date-fns-tz";
@@ -51,7 +52,7 @@ export const generateAllTimeSlots = (
   );
 
   const timeSlotsWithTimeSpecifiedTimeZone = timeSlots.map((time) =>
-    zonedTimeToUtc(upgradeDateToDateTime(date, time), timezone)
+    formatISO(zonedTimeToUtc(upgradeDateToDateTime(date, time), timezone))
   );
 
   return timeSlotsWithTimeSpecifiedTimeZone;

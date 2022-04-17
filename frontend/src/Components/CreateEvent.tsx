@@ -170,7 +170,6 @@ const TimePickerField = (...props: any[]) => {
         filterTime={filterTimeForNoLater}
         onChange={(time) => {
           if (time) {
-            // console.log(time);
             setFieldValue("noLaterThenTime", time);
             updateRestrictedInterval(restrictedTimeInterval[0], time);
           }
