@@ -1,0 +1,8 @@
+/* Super hacky, this aligns the y axis with the grid*/
+.meeting-grid > div:nth-child(1) > div:nth-child(1) {
+  margin-top: 3rem !important;
+}
+
+.meeting-grid {
+  width: 75%;
+}

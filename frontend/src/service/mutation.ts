@@ -1,20 +1,28 @@
 import axios from "axios";
-import { calendarPath, SchedMeetEvent } from "../constants";
 
-export const addEventMutationFunction = ({
+import {
+  calendarPath,
+  eventPath,
+  SchedMeetNewEventRequest,
+  SchedMeetNewEventResponse,
+  availabilityPath,
+  AvailabilityBookingAction,
+} from "../constants";
+
+export const createNewEventMutation = ({
   newEvent,
   authToken,
 }: {
-  newEvent: SchedMeetEvent;
+  newEvent: SchedMeetNewEventRequest;
   authToken: string;
 }) => {
-  return axios.post<SchedMeetEvent>(
-    `${calendarPath}/new`,
+  // TODO: timeRestrictions
+  return axios.post<SchedMeetNewEventResponse>(
+    `${eventPath}/new`,
     {
-      event_id: newEvent.resource?.event_id,
       event_title: newEvent.title,
-      event_start_time: newEvent.start,
-      event_end_time: newEvent.end,
+      event_description: newEvent.description,
+      datetime_slots: newEvent.availableDateTimeIntervals,
     },
     {
       headers: {
@@ -25,19 +33,18 @@ export const addEventMutationFunction = ({
 };
 
 export const updateEventMutationFunction = ({
-  movedEvent,
+  newAvailabilityBooking,
   authToken,
 }: {
-  movedEvent: SchedMeetEvent;
+  newAvailabilityBooking: AvailabilityBookingAction;
   authToken: string;
 }) => {
-  return axios.put<SchedMeetEvent>(
-    `${calendarPath}/update`,
+  return axios.post<AvailabilityBookingAction>(
+    `${availabilityPath}/new`,
     {
-      event_id: movedEvent.resource?.event_id,
-      event_title: movedEvent.title,
-      event_start_time: movedEvent.start,
-      event_end_time: movedEvent.end,
+      event_id: newAvailabilityBooking.event_id,
+      event_availability_slot: newAvailabilityBooking.time_slot,
+      event_action: newAvailabilityBooking.action,
     },
     {
       headers: {

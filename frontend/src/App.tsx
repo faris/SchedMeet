@@ -2,9 +2,11 @@ import React, { useEffect, useState } from "react";
 import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";
 import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
-import { LoggedIn } from "./Components/LoggedIn";
+import { CreateNewEventPage } from "./Components/LoggedIn";
 import { useAuthStore } from "./stores/authStore";
 import { QueryClient, QueryClientProvider } from "react-query";
+import { Routes, Route, Link } from "react-router-dom";
+import { MyCalendar } from "./Components/Calendar";
 
 const queryClient = new QueryClient();
 
@@ -49,6 +51,13 @@ function App() {
     const unregisterAuthObserver = firebase
       .auth()
       .onAuthStateChanged((user) => {
+        // TODO: maybe give identifiers to anonymous accounts.
+        if (user?.isAnonymous && user?.displayName === null) {
+          user.updateProfile({
+            displayName: "Jane Q. User",
+          });
+        }
+
         setIsSignedIn(!!user);
         if (user !== null) {
           setFireBaseUser(user);
@@ -72,7 +81,10 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <LoggedIn />
+      <Routes>
+        <Route path="/" element={<CreateNewEventPage />} />
+        <Route path="/event/:event_id" element={<MyCalendar />} />
+      </Routes>
     </QueryClientProvider>
   );
 }

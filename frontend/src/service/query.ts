@@ -1,24 +1,20 @@
 import axios from "axios";
-import { calendarPath, SchedMeetEvent } from "../constants";
-
-export const getEvents = async (authToken: string) => {
-  const result = await axios.get<
-    {
-      title: string;
-      start: string | Date;
-      end: string | Date;
-      resource: { event_id: string };
-    }[]
-  >(`${calendarPath}/events/`, {
+import { availabilityPath, BookedTimeSlot } from "../constants";
+import { BookingResponse } from "../helpers/gridMap";
+export const getEventInformation = async (
+  authToken: string,
+  event_id: string
+) => {
+  const result = await axios.get<{
+    event_title: string;
+    event_description: string;
+    availableTimeSlots: Array<string>;
+    booked_slots: Array<BookingResponse>;
+  }>(`${availabilityPath}/${event_id}`, {
     headers: {
       Authorization: `Bearer ${authToken}`,
     },
   });
 
-  for (const event of result.data) {
-    event.start = new Date(event.start);
-    event.end = new Date(event.end);
-  }
-
-  return result.data as SchedMeetEvent[];
+  return result;
 };
