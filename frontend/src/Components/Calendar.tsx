@@ -1,39 +1,61 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import "../styles/calendar-overrides.css";
 import { useParams } from "react-router-dom";
 import { HeatMapGrid } from "react-grid-heatmap";
 import format from "date-fns/format";
 import ToggleButton from "@mui/material/ToggleButton";
 import enUS from "date-fns/locale/en-US";
-import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
-import "react-big-calendar/lib/css/react-big-calendar.css";
+
 import { useCalendarStore } from "../stores/eventStore";
 import { useAuthStore } from "../stores/authStore";
 import { getEventInformation } from "../service/query";
 import { useAvailableSlotsStore } from "../stores/availabilityStore";
-import { useQuery, useQueryClient } from "react-query";
+import { useQuery, useMutation } from "react-query";
+import { addAvailablityMutationFunction } from "../service/mutation";
+import { AvailabilityBookingAction } from "../constants";
 
 export const MyCalendar = () => {
-  const { authToken, retrieveAuthToken } = useAuthStore();
+  const { authToken, retrieveAuthToken, firebaseUser } = useAuthStore();
   const { event_id } = useParams();
   const { setEventMetadata, eventMetadata } = useCalendarStore();
 
   const { generateGridMap, gridMap, toggleSlot } = useAvailableSlotsStore();
 
+  const addAvailablityMutation = useMutation(addAvailablityMutationFunction, {
+    mutationKey: "addAvailability",
+  });
+
   useEffect(() => {
     retrieveAuthToken();
   }, []);
 
-  const queryClient = useQueryClient();
+  const setGridToggle = useCallback(
+    (x: number, y: number) => {
+      if (event_id && gridMap) {
+        const actionDone = toggleSlot(x, y);
+        const newAvailabilityBooking: AvailabilityBookingAction = {
+          event_id: event_id,
+          action: actionDone,
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          time_slot: gridMap!.gridMap[y][x].timeSlot!,
+        };
 
-  // background cache on failure of operation or after 5 mins and a remount.
+        addAvailablityMutation.mutate({ newAvailabilityBooking, authToken });
+      }
+    },
+    [event_id, gridMap]
+  );
 
-  const fetchCalendarEvents = useQuery(
+  useQuery(
     ["fetchCalendarEvents", authToken],
     () => getEventInformation(authToken, event_id || ""),
     {
       onSuccess: (response) => {
-        generateGridMap(response.data.availableTimeSlots);
+        generateGridMap(
+          response.data.availableTimeSlots,
+          response.data.booked_slots,
+          firebaseUser!.uid
+        );
         setEventMetadata(
           response.data.event_title,
           response.data.event_description
@@ -100,7 +122,7 @@ export const MyCalendar = () => {
             }
             cellHeight="3rem"
             xLabelsPos="top"
-            onClick={(x, y) => toggleSlot(x, y)}
+            onClick={setGridToggle}
           />
         </div>
       </>

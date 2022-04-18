@@ -1,5 +1,4 @@
 import axios from "axios";
-import { Event as CalendarEvent } from "react-big-calendar";
 
 import {
   calendarPath,
@@ -8,6 +7,7 @@ import {
   SchedMeetNewEventRequest,
   SchedMeetNewEventResponse,
   availabilityPath,
+  AvailabilityBookingAction,
 } from "../constants";
 
 export const createNewEventMutation = ({
@@ -33,18 +33,19 @@ export const createNewEventMutation = ({
   );
 };
 
-export const addEventMutationFunction = ({
-  newEvent,
+export const addAvailablityMutationFunction = ({
+  newAvailabilityBooking,
   authToken,
 }: {
-  newEvent: CalendarEvent;
+  newAvailabilityBooking: AvailabilityBookingAction;
   authToken: string;
 }) => {
   return axios.post<SchedMeetEvent>(
     `${availabilityPath}/new`,
     {
-      event_id: newEvent.resource?.event_id,
-      event_availability_slot: [newEvent.start, newEvent.end],
+      event_id: newAvailabilityBooking.event_id,
+      event_availability_slot: newAvailabilityBooking.time_slot,
+      event_action: newAvailabilityBooking.action,
     },
     {
       headers: {

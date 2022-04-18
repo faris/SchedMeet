@@ -19,7 +19,7 @@ import { createNewEventMutation } from "../service/mutation";
 import { useMutation } from "react-query";
 import { useAuthStore } from "../stores/authStore";
 import { useNewEventFormStore } from "../stores/newEventFormStore";
-import compareAsc from "date-fns/compareAsc";
+import { compareAsc, formatISO } from "date-fns";
 import { TextFieldCopy } from "../Components/utility/copyTextField";
 import { getTimeZones } from "@vvo/tzdb";
 
@@ -74,7 +74,7 @@ const DatePickerField = (...props: any[]) => {
         setStartDate(start);
         setEndDate(end);
 
-        if (start && !end && selectedDates.has(start.toISOString())) {
+        if (start && !end && selectedDates.has(formatISO(start))) {
           deleteEventDate(start);
           setStartDate(null);
         } else if (start && end) {
@@ -170,6 +170,7 @@ const TimePickerField = (...props: any[]) => {
         filterTime={filterTimeForNoLater}
         onChange={(time) => {
           if (time) {
+            // console.log(time);
             setFieldValue("noLaterThenTime", time);
             updateRestrictedInterval(restrictedTimeInterval[0], time);
           }

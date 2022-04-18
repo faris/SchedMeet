@@ -10,10 +10,11 @@ export const calendarPath = `${baseURL}/calendar`;
 export const eventPath = `${baseURL}/event`;
 export const availabilityPath = `${baseURL}/availability`;
 
-export interface GridMapMetaData {
-  position: string;
-  timeSlot: Date;
-  userBooked: boolean;
+export type toggleActions = "TOGGLE" | "UNTOGGLE";
+export interface AvailabilityBookingAction {
+  event_id: string;
+  time_slot: Date;
+  action: toggleActions;
 }
 
 interface SchedMeetMetadata {

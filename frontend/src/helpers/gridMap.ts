@@ -12,8 +12,14 @@ interface GridAxis {
   timesAxis: Array<string>;
 }
 
+export interface BookingResponse {
+  availability_slot: string;
+  availability_owner: string;
+}
+
 export interface GridMapMetaDataSlot {
   position: [number, number];
+  participants?: Set<string>;
   timeSlot: Date;
   userBooked: boolean;
   bookableTime: boolean;
@@ -23,15 +29,23 @@ export class GridMap {
   xAxis: Array<Date>;
   yAxis: Array<string>;
   availableTimeSlots: Set<string>;
-  dateLocation: Map<Date, [number, number]>;
+  dateLocation: Map<string, [number, number]>;
   gridMap: Array<Array<GridMapMetaDataSlot>>;
+  bookedAvailability: Array<BookingResponse>;
+  userID: string;
 
-  constructor(timeSlots: Array<string>) {
+  constructor(
+    timeSlots: Array<string>,
+    bookedAvailability: Array<BookingResponse>,
+    userID: string
+  ) {
     const axises = this.generateAxises(timeSlots);
     this.xAxis = axises.datesAxis;
     this.yAxis = axises.timesAxis;
     this.dateLocation = new Map();
+    this.userID = userID;
     this.availableTimeSlots = new Set(timeSlots);
+    this.bookedAvailability = bookedAvailability;
     this.gridMap = new Array(this.xAxis.length)
       .fill([])
       .map(() => new Array(this.yAxis.length).fill(0));
@@ -73,18 +87,34 @@ export class GridMap {
           position: [bookableTimeSlotIndex, bookableDateIndex],
           timeSlot: timeSlot,
           userBooked: false,
-          bookableTime: this.availableTimeSlots.has(formatISO(timeSlot)),
+          bookableTime: this.availableTimeSlots.has(timeSlot.toISOString()),
         };
-
+        this.dateLocation.set(timeSlot.toISOString(), [
+          bookableDateIndex,
+          bookableTimeSlotIndex,
+        ]);
         this.gridMap[bookableDateIndex][bookableTimeSlotIndex] = GridBlockObj;
       }
     }
+
+    for (const bookedAvailability of this.bookedAvailability) {
+      console.log(bookedAvailability.availability_slot);
+      const x = this.dateLocation.get(bookedAvailability.availability_slot);
+      const [yAxis, xAxis] = x!;
+      this.gridMap[yAxis][xAxis].participants?.add(
+        bookedAvailability.availability_owner
+      );
+
+      if (bookedAvailability.availability_owner == this.userID) {
+        this.gridMap[yAxis][xAxis].userBooked = true;
+      }
+    }
+
     return this.gridMap;
   }
 
   toggleSlot(xPos: number, yPos: number): Array<Array<GridMapMetaDataSlot>> {
     this.gridMap[xPos][yPos].userBooked = !this.gridMap[xPos][yPos].userBooked;
-    console.log(this.gridMap[xPos][yPos]);
     return this.gridMap;
   }
 }

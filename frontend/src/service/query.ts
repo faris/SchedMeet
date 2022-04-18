@@ -1,6 +1,6 @@
 import axios from "axios";
 import { availabilityPath, BookedTimeSlot } from "../constants";
-
+import { BookingResponse } from "../helpers/gridMap";
 export const getEventInformation = async (
   authToken: string,
   event_id: string
@@ -9,7 +9,7 @@ export const getEventInformation = async (
     event_title: string;
     event_description: string;
     availableTimeSlots: Array<string>;
-    booked_slots: Array<BookedTimeSlot>;
+    booked_slots: Array<BookingResponse>;
   }>(`${availabilityPath}/${event_id}`, {
     headers: {
       Authorization: `Bearer ${authToken}`,

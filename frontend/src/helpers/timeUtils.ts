@@ -52,7 +52,7 @@ export const generateAllTimeSlots = (
   );
 
   const timeSlotsWithTimeSpecifiedTimeZone = timeSlots.map((time) =>
-    formatISO(zonedTimeToUtc(upgradeDateToDateTime(date, time), timezone))
+    zonedTimeToUtc(upgradeDateToDateTime(date, time), timezone).toISOString()
   );
 
   return timeSlotsWithTimeSpecifiedTimeZone;

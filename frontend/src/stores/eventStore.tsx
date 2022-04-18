@@ -1,10 +1,4 @@
 import create from "zustand";
-import {
-  SchedMeetEvent,
-  BookedTimeSlot,
-  convertBookedTimeSlotToSchedMeetEvent,
-} from "../constants";
-import { stringOrDate } from "react-big-calendar";
 
 interface CalendarState {
   userAvailabilitySlots: Map<string, Map<string, Array<string>>>;
