@@ -11,7 +11,7 @@ import { useAuthStore } from "../stores/authStore";
 import { getEventInformation } from "../service/query";
 import { useAvailableSlotsStore } from "../stores/availabilityStore";
 import { useQuery, useMutation } from "react-query";
-import { addAvailablityMutationFunction } from "../service/mutation";
+import { updateEventMutationFunction } from "../service/mutation";
 import { AvailabilityBookingAction } from "../constants";
 
 export const MyCalendar = () => {
@@ -21,9 +21,12 @@ export const MyCalendar = () => {
 
   const { generateGridMap, gridMap, toggleSlot } = useAvailableSlotsStore();
 
-  const addAvailablityMutation = useMutation(addAvailablityMutationFunction, {
-    mutationKey: "addAvailability",
-  });
+  const updateAvailablitySlotMutation = useMutation(
+    updateEventMutationFunction,
+    {
+      mutationKey: "updateAvailablitySlot",
+    }
+  );
 
   useEffect(() => {
     retrieveAuthToken();
@@ -40,7 +43,10 @@ export const MyCalendar = () => {
           time_slot: gridMap!.gridMap[y][x].timeSlot!,
         };
 
-        addAvailablityMutation.mutate({ newAvailabilityBooking, authToken });
+        updateAvailablitySlotMutation.mutate({
+          newAvailabilityBooking,
+          authToken,
+        });
       }
     },
     [event_id, gridMap]

@@ -2,7 +2,6 @@ import axios from "axios";
 
 import {
   calendarPath,
-  SchedMeetEvent,
   eventPath,
   SchedMeetNewEventRequest,
   SchedMeetNewEventResponse,
@@ -33,41 +32,19 @@ export const createNewEventMutation = ({
   );
 };
 
-export const addAvailablityMutationFunction = ({
+export const updateEventMutationFunction = ({
   newAvailabilityBooking,
   authToken,
 }: {
   newAvailabilityBooking: AvailabilityBookingAction;
   authToken: string;
 }) => {
-  return axios.post<SchedMeetEvent>(
+  return axios.post<AvailabilityBookingAction>(
     `${availabilityPath}/new`,
     {
       event_id: newAvailabilityBooking.event_id,
       event_availability_slot: newAvailabilityBooking.time_slot,
       event_action: newAvailabilityBooking.action,
-    },
-    {
-      headers: {
-        Authorization: `Bearer ${authToken}`,
-      },
-    }
-  );
-};
-
-export const updateEventMutationFunction = ({
-  movedEvent,
-  authToken,
-}: {
-  movedEvent: SchedMeetEvent;
-  authToken: string;
-}) => {
-  return axios.put<SchedMeetEvent>(
-    `${calendarPath}/update`,
-    {
-      event_title: movedEvent.title,
-      event_start_time: movedEvent.start,
-      event_end_time: movedEvent.end,
     },
     {
       headers: {

@@ -1,7 +1,6 @@
 import React from "react";
 import { useAvailableSlotsStore } from "../stores/availabilityStore";
 import { act, renderHook } from "@testing-library/react-hooks";
-import { Navigate, NavigateAction, TitleOptions } from "react-big-calendar";
 import { Action } from "history";
 import addMilliseconds from "date-fns/addMilliseconds";
 import { parseISO } from "date-fns";

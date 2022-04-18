@@ -19,7 +19,7 @@ export interface BookingResponse {
 
 export interface GridMapMetaDataSlot {
   position: [number, number];
-  participants?: Set<string>;
+  participants: Set<string>;
   timeSlot: Date;
   userBooked: boolean;
   bookableTime: boolean;
@@ -88,6 +88,7 @@ export class GridMap {
           timeSlot: timeSlot,
           userBooked: false,
           bookableTime: this.availableTimeSlots.has(timeSlot.toISOString()),
+          participants: new Set(),
         };
         this.dateLocation.set(timeSlot.toISOString(), [
           bookableDateIndex,
@@ -98,10 +99,11 @@ export class GridMap {
     }
 
     for (const bookedAvailability of this.bookedAvailability) {
-      console.log(bookedAvailability.availability_slot);
-      const x = this.dateLocation.get(bookedAvailability.availability_slot);
-      const [yAxis, xAxis] = x!;
-      this.gridMap[yAxis][xAxis].participants?.add(
+      const [yAxis, xAxis] = this.dateLocation.get(
+        bookedAvailability.availability_slot
+      )!;
+
+      this.gridMap[yAxis][xAxis].participants.add(
         bookedAvailability.availability_owner
       );
 
