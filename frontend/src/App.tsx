@@ -7,9 +7,6 @@ import { useAuthStore } from "./stores/authStore";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { Routes, Route, Link } from "react-router-dom";
 import { MyCalendar } from "./Components/Calendar";
-import { enableMapSet } from "immer";
-
-enableMapSet();
 
 const queryClient = new QueryClient();
 
