@@ -36,10 +36,10 @@ export const useAvailableSlotsStore = create<AvailabilityState>(
     },
     toggleSlot: (xPos: number, yPos: number) => {
       const gridMap = get().gridMap;
-      const actionDone = gridMap?.gridMap[yPos][xPos].userBooked
+      const actionDone = gridMap?.gridMap[xPos][yPos].userBooked
         ? "UNTOGGLE"
         : "TOGGLE";
-      gridMap?.toggleSlot(yPos, xPos);
+      gridMap?.toggleSlot(xPos, yPos);
       set({ gridMap: gridMap });
       return actionDone;
     },

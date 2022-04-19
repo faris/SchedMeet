@@ -40,7 +40,7 @@ export const MyCalendar = () => {
           event_id: event_id,
           action: actionDone,
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          time_slot: gridMap!.gridMap[y][x].timeSlot!,
+          time_slot: gridMap!.gridMap[x][y].timeSlot!,
         };
 
         updateAvailablitySlotMutation.mutate({
@@ -78,14 +78,6 @@ export const MyCalendar = () => {
     );
     const yLabels = gridMap.yAxis;
 
-    const data = new Array(yLabels.length)
-      .fill(0)
-      .map(() =>
-        new Array(xLabels.length)
-          .fill(0)
-          .map(() => Math.floor(Math.random() * 10))
-      );
-
     console.log(gridMap);
     return (
       <>
@@ -93,7 +85,7 @@ export const MyCalendar = () => {
         <p>{eventMetadata.description}</p>
         <div className="meeting-grid">
           <HeatMapGrid
-            data={data}
+            data={gridMap.availableParticipantsMatrix}
             xLabels={xLabels}
             yLabels={yLabels}
             // Reder cell with tooltip
@@ -101,16 +93,16 @@ export const MyCalendar = () => {
               <div
                 style={{ outlineStyle: "dashed" }}
                 title={`(${x}, ${y}) = ${JSON.stringify(
-                  gridMap.gridMap[y][x]
+                  gridMap.gridMap[x][y]
                 )}`}
               >
-                {gridMap.gridMap[y][x].bookableTime ? value : "unbookable"}
+                {gridMap.gridMap[x][y].bookableTime ? value : "unbookable"}
               </div>
             )}
             cellStyle={(x, y, ratio) =>
-              gridMap.gridMap[y][x].bookableTime
+              gridMap.gridMap[x][y].bookableTime
                 ? {
-                    background: gridMap.gridMap[y][x].userBooked
+                    background: gridMap.gridMap[x][y].userBooked
                       ? `rgb(12, 160, 44)`
                       : `rgb(180, 180, 180)`,
                     fontSize: ".8rem",

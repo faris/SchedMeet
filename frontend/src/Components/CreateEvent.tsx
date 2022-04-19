@@ -20,7 +20,7 @@ import { useMutation } from "react-query";
 import { useAuthStore } from "../stores/authStore";
 import { useNewEventFormStore } from "../stores/newEventFormStore";
 import { compareAsc } from "date-fns";
-import { TextFieldCopy } from "../Components/utility/copyTextField";
+// import { TextFieldCopy } from "../Components/utility/copyTextField";
 import { getTimeZones } from "@vvo/tzdb";
 
 const DatePickerField = (...props: any[]) => {
@@ -242,7 +242,7 @@ export const SignupForm = () => {
 
   // TODO: alert modal?
   if (createNewEvent.isError) {
-    return <TextFieldCopy></TextFieldCopy>;
+    return <></>;
   }
 
   if (createNewEvent.isSuccess) {

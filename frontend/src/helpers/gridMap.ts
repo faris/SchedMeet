@@ -24,6 +24,7 @@ export class GridMap {
   availableTimeSlots: Set<string>;
   dateLocation: Map<string, [number, number]>;
   gridMap: Array<Array<GridMapMetaDataSlot>>;
+  availableParticipantsMatrix: Array<Array<number>>;
   bookedAvailability: Array<BookingResponse>;
   userID: string;
 
@@ -39,9 +40,12 @@ export class GridMap {
     this.userID = userID;
     this.availableTimeSlots = new Set(timeSlots);
     this.bookedAvailability = bookedAvailability;
-    this.gridMap = new Array(this.xAxis.length)
+    this.gridMap = new Array(this.yAxis.length)
       .fill([])
-      .map(() => new Array(this.yAxis.length).fill(0));
+      .map(() => new Array(this.xAxis.length).fill(0));
+    this.availableParticipantsMatrix = new Array(this.yAxis.length)
+      .fill([])
+      .map(() => new Array(this.xAxis.length).fill(0));
     this.generateBoard();
   }
 
@@ -84,24 +88,27 @@ export class GridMap {
           participants: new Set(),
         };
         this.dateLocation.set(timeSlot.toISOString(), [
-          bookableDateIndex,
           bookableTimeSlotIndex,
+          bookableDateIndex,
         ]);
-        this.gridMap[bookableDateIndex][bookableTimeSlotIndex] = GridBlockObj;
+        this.gridMap[bookableTimeSlotIndex][bookableDateIndex] = GridBlockObj;
       }
     }
 
     for (const bookedAvailability of this.bookedAvailability) {
-      const [yAxis, xAxis] = this.dateLocation.get(
+      const [timeIndex, dateIndex] = this.dateLocation.get(
         bookedAvailability.availability_slot
       )!;
 
-      this.gridMap[yAxis][xAxis].participants.add(
+      this.gridMap[timeIndex][dateIndex].participants.add(
         bookedAvailability.availability_owner
       );
 
+      this.availableParticipantsMatrix[timeIndex][dateIndex] =
+        this.availableParticipantsMatrix[timeIndex][dateIndex] + 1;
+
       if (bookedAvailability.availability_owner == this.userID) {
-        this.gridMap[yAxis][xAxis].userBooked = true;
+        this.gridMap[timeIndex][dateIndex].userBooked = true;
       }
     }
 
