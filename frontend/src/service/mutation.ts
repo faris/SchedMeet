@@ -40,7 +40,7 @@ export const updateEventMutationFunction = ({
   authToken: string;
 }) => {
   return axios.post<AvailabilityBookingAction>(
-    `${availabilityPath}/new`,
+    `${availabilityPath}/update`,
     {
       event_id: newAvailabilityBooking.event_id,
       event_availability_slot: newAvailabilityBooking.time_slot,

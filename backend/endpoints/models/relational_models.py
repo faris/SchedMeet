@@ -71,10 +71,9 @@ description: The description for the event.
 availabilityPDB = Table(
     "availability",
     metadata_object,
-    Column("availability_id", String, primary_key=True),
-    Column("event_id", String, ForeignKey("events.event_id")),
+    Column("event_id", String, ForeignKey("events.event_id"), primary_key=True),
     Column("availability_slot", String, primary_key=True),
-    Column("availability_owner", String),
+    Column("availability_owner", String, primary_key=True),
 )
 
 engine = create_engine(POSTGRES_CONNECTION_URL)

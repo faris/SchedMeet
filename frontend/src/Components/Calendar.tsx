@@ -74,7 +74,7 @@ export const MyCalendar = () => {
 
   if (gridMap) {
     const xLabels = gridMap.xAxis.map(
-      (date) => `${format(date, "EEEE MM-dd-yy")}`
+      (date: Date) => `${format(date, "EEEE MM-dd-yy")}`
     );
     const yLabels = gridMap.yAxis;
 

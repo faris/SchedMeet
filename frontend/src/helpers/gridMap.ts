@@ -1,11 +1,4 @@
-import {
-  startOfDay,
-  parseISO,
-  compareAsc,
-  format,
-  parse,
-  formatISO,
-} from "date-fns";
+import { startOfDay, parseISO, compareAsc, format, parse } from "date-fns";
 
 interface GridAxis {
   datesAxis: Array<Date>;
