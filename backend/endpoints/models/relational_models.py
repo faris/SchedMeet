@@ -9,6 +9,7 @@ from sqlalchemy import (
     DateTime,
     ForeignKey,
 )
+
 POSTGRES_CONNECTION_URL = os.environ.get("POSTGRES_CONN_STRING", None)
 
 

@@ -1,9 +1,11 @@
 import os
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
-from endpoints.psql import admin_sql,availability_sql
+from endpoints.psql import admin_sql, availability_sql
+from endpoints.dydb import admin_ddb
 from endpoints import hello
 from endpoints.models.relational_models import metadata_object, engine
+from endpoints.models.dynamo_models import CalendarEvent
 import logging
 import uvicorn
 
@@ -21,7 +23,12 @@ app.include_router(
 
 app.include_router(
     admin_sql.router,
-    prefix="/event",
+    prefix="/psql/event",
+)
+
+app.include_router(
+    admin_ddb.router,
+    prefix="/dydb/event",
 )
 
 ENVIRONMENT = os.environ.get("ENVIRONMENT", "dev")
@@ -45,3 +52,5 @@ def read_root():
 
 
 metadata_object.create_all(engine, checkfirst=True)
+if not CalendarEvent.exists():
+    CalendarEvent.create_table(read_capacity_units=5, write_capacity_units=5, wait=True)

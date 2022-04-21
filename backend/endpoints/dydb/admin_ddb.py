@@ -1,12 +1,9 @@
-import calendar
-from fastapi import APIRouter, Depends, Request, HTTPException
+from fastapi import APIRouter, Depends
+from uuid import uuid4
 from dependency import authenticated_uid_check
 from ..models.fast_api_models import NewEventRequest
-from ..models.relational_models import eventsPDB, eventToDateTable, engine
-from sqlalchemy.sql import select, update
-from psycopg2.extras import DateTimeTZRange
-from uuid import uuid4
-import logging
+from ..models.dynamo_models import CalendarEvent
+
 
 router = APIRouter()
 
@@ -35,8 +32,13 @@ def create_event(
             }
         )
 
-    with engine.connect() as connection:
-        connection.execute(eventsPDB.insert(), eventMetaDataObj)
-        connection.execute(eventToDateTable.insert(), event_date_time_slots)
-
+    new_event = CalendarEvent(
+        event_id,
+        event_owner=user_id,
+        event_title=new_event.event_title,
+        event_description=new_event.event_description,
+        event_datetime_slots=event_date_time_slots,
+        event_availability_slots=dict(),
+    )
+    new_event.save()
     return eventMetaDataObj
