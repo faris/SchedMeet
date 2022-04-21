@@ -10,7 +10,7 @@ import "../styles/calendar-overrides.css";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import {
-  eventPath,
+  eventSQLPath,
   EventTimeRestrictions,
   SchedMeetNewEventFormValues,
   timeZoneList,

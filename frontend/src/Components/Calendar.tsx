@@ -10,7 +10,7 @@ import { useCalendarStore } from "../stores/eventStore";
 import { useAuthStore } from "../stores/authStore";
 import { getEventInformation } from "../service/query";
 import { useAvailableSlotsStore } from "../stores/availabilityStore";
-import { useQuery, useMutation } from "react-query";
+import { useQuery, useMutation, useQueryClient } from "react-query";
 import { updateEventMutationFunction } from "../service/mutation";
 import { AvailabilityBookingAction } from "../constants";
 
@@ -18,6 +18,7 @@ export const MyCalendar = () => {
   const { authToken, retrieveAuthToken, firebaseUser } = useAuthStore();
   const { event_id } = useParams();
   const { setEventMetadata, eventMetadata } = useCalendarStore();
+  const queryClient = useQueryClient();
 
   const { generateGridMap, gridMap, toggleSlot } = useAvailableSlotsStore();
 
@@ -25,6 +26,9 @@ export const MyCalendar = () => {
     updateEventMutationFunction,
     {
       mutationKey: "updateAvailablitySlot",
+      onSuccess: () => {
+        queryClient.invalidateQueries("fetchCalendarEvents");
+      },
     }
   );
 

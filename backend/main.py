@@ -1,7 +1,8 @@
 import os
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
-from endpoints import hello, availability, admin
+from endpoints.psql import admin_sql,availability_sql
+from endpoints import hello
 from endpoints.models.relational_models import metadata_object, engine
 import logging
 import uvicorn
@@ -10,16 +11,16 @@ app = FastAPI()
 
 app.include_router(
     hello.router,
-    prefix="/auth",
+    prefix="/psql/auth",
 )
 
 app.include_router(
-    availability.router,
-    prefix="/availability",
+    availability_sql.router,
+    prefix="/psql/availability",
 )
 
 app.include_router(
-    admin.router,
+    admin_sql.router,
     prefix="/event",
 )
 

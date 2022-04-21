@@ -6,8 +6,8 @@ export const baseURL =
 
 export const testAuthPath = `${baseURL}/auth/test`;
 export const calendarPath = `${baseURL}/calendar`;
-export const eventPath = `${baseURL}/event`;
-export const availabilityPath = `${baseURL}/availability`;
+export const eventSQLPath = `${baseURL}/psql/event`;
+export const availabilitySQLPath = `${baseURL}/psql/availability`;
 
 export type toggleActions = "TOGGLE" | "UNTOGGLE";
 export interface AvailabilityBookingAction {

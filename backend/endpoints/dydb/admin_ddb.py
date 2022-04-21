@@ -1,8 +1,8 @@
 import calendar
 from fastapi import APIRouter, Depends, Request, HTTPException
 from dependency import authenticated_uid_check
-from .models.fast_api_models import NewEventRequest
-from .models.relational_models import eventsPDB, eventToDateTable, engine
+from ..models.fast_api_models import NewEventRequest
+from ..models.relational_models import eventsPDB, eventToDateTable, engine
 from sqlalchemy.sql import select, update
 from psycopg2.extras import DateTimeTZRange
 from uuid import uuid4

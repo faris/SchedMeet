@@ -3,8 +3,8 @@ from uuid import uuid4
 import datetime
 from fastapi import APIRouter, Depends, HTTPException
 from dependency import authenticated_uid_check
-from .models.fast_api_models import AvailabilitySlotRequest
-from .models.relational_models import eventsPDB,eventToDateTable, availabilityPDB, engine
+from ..models.fast_api_models import AvailabilitySlotRequest
+from ..models.relational_models import eventsPDB,eventToDateTable, availabilityPDB, engine
 from sqlalchemy.sql import select, update, delete
 from psycopg2.extras import DateTimeTZRange
 
@@ -100,37 +100,3 @@ def get_events(user_id: str = Depends(authenticated_uid_check)):
 
     return events
 
-
-
-
-
-@router.put("/update")
-def update_event(event: AvailabilitySlotRequest, user_id: str = Depends(authenticated_uid_check)):
-
-    event_db_obj = {
-        "event_id": event.event_id,
-        "event_title": event.event_title,
-        "event_owner": user_id,
-        "event_start_time": event.event_start_time,
-        "event_end_time": event.event_end_time,
-        "event_description": event.description,
-    }
-
-    with engine.connect() as connection:
-        update_operation = (
-            update(eventsPDB)
-            .where(eventsPDB.c.event_owner == user_id)
-            .where(eventsPDB.c.event_id == event.event_id)
-        )
-        result = connection.execute(update_operation, event_db_obj)
-
-        if result:
-            event_obj = {
-                "title": event.event_title,
-                "start": event.event_start_time,
-                "end": event.event_end_time,
-                "resource": {"event_id": event.event_id},
-            }
-            return event_obj
-        else:
-            raise HTTPException(status_code=404, detail="Event not found")

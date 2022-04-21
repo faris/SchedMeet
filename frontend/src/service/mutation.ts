@@ -2,10 +2,10 @@ import axios from "axios";
 
 import {
   calendarPath,
-  eventPath,
+  eventSQLPath,
   SchedMeetNewEventRequest,
   SchedMeetNewEventResponse,
-  availabilityPath,
+  availabilitySQLPath,
   AvailabilityBookingAction,
 } from "../constants";
 
@@ -18,7 +18,7 @@ export const createNewEventMutation = ({
 }) => {
   // TODO: timeRestrictions
   return axios.post<SchedMeetNewEventResponse>(
-    `${eventPath}/new`,
+    `${eventSQLPath}/new`,
     {
       event_title: newEvent.title,
       event_description: newEvent.description,
@@ -40,7 +40,7 @@ export const updateEventMutationFunction = ({
   authToken: string;
 }) => {
   return axios.post<AvailabilityBookingAction>(
-    `${availabilityPath}/update`,
+    `${availabilitySQLPath}/update`,
     {
       event_id: newAvailabilityBooking.event_id,
       event_availability_slot: newAvailabilityBooking.time_slot,
