@@ -2,7 +2,7 @@ import os
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
 from endpoints.psql import admin_sql, availability_sql
-from endpoints.dydb import admin_ddb
+from endpoints.dydb import admin_ddb, availability_ddb
 from endpoints import hello
 from endpoints.models.relational_models import metadata_object, engine
 from endpoints.models.dynamo_models import CalendarEvent
@@ -30,6 +30,12 @@ app.include_router(
     admin_ddb.router,
     prefix="/dydb/event",
 )
+
+app.include_router(
+    availability_ddb.router,
+    prefix="/dydb/availability",
+)
+
 
 ENVIRONMENT = os.environ.get("ENVIRONMENT", "dev")
 

@@ -12,7 +12,8 @@ from ..models.relational_models import (
 )
 from sqlalchemy.sql import select, update, delete
 from psycopg2.extras import DateTimeTZRange
-
+from ..models.dynamo_models import CalendarEvent
+import logging
 
 router = APIRouter()
 
@@ -20,58 +21,15 @@ router = APIRouter()
 @router.get("/{event_id}")
 def get_events(event_id: str, user_id: str = Depends(authenticated_uid_check)):
 
-    title, description, availableTimeSlots, bookedSlots = None, None, [], []
-
-    with engine.connect() as connection:
-        availableTimeSlotsJoinedTable = eventsPDB.join(
-            eventToDateTable, eventToDateTable.c.event_id == eventsPDB.c.event_id
-        )
-        availableTimeSlotsQuery = (
-            select(
-                [
-                    eventsPDB.c.event_title,
-                    eventsPDB.c.event_description,
-                    eventToDateTable.c.event_datetime_slot,
-                ]
-            )
-            .select_from(availableTimeSlotsJoinedTable)
-            .where(eventsPDB.c.event_id == event_id)
-        )
-        availableTimeSlotsResult = connection.execute(
-            availableTimeSlotsQuery
-        ).fetchall()
-
-    for row in availableTimeSlotsResult:
-        availableTimeSlots.append(row[2])
-        title, description = row[0], row[1]
-
-    with engine.connect() as connection:
-        bookedTimeSlotsJoinedTable = eventsPDB.join(
-            availabilityPDB, availabilityPDB.c.event_id == eventsPDB.c.event_id
-        )
-        bookedTimeSlotsQuery = (
-            select(
-                [
-                    availabilityPDB.c.availability_owner,
-                    availabilityPDB.c.availability_slot,
-                ]
-            )
-            .select_from(bookedTimeSlotsJoinedTable)
-            .where(eventsPDB.c.event_id == event_id)
-        )
-        bookedTimeSlotsResult = connection.execute(bookedTimeSlotsQuery).fetchall()
-
-    for row in bookedTimeSlotsResult:
-        bookedEvent = {"availability_owner": row[0], "availability_slot": row[1]}
-        bookedSlots.append(bookedEvent)
-
-    if availableTimeSlotsResult:
+    calendar_event = CalendarEvent.get(event_id)
+    
+    if calendar_event:
         return {
             "event_id": event_id,
-            "event_title": title,
-            "event_description": description,
-            "availableTimeSlots": availableTimeSlots,
-            "booked_slots": bookedSlots,
+            "event_title": calendar_event.event_title,
+            "event_description": calendar_event.event_description,
+            "availableTimeSlots": calendar_event.event_datetime_slots,
+            "booked_slots": [],
         }
     else:
         raise HTTPException(status_code=404, detail="Event not found")
