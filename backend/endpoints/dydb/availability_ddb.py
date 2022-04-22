@@ -22,14 +22,23 @@ router = APIRouter()
 def get_events(event_id: str, user_id: str = Depends(authenticated_uid_check)):
 
     calendar_event = CalendarEvent.get(event_id)
+    booked_slots = []
+    
     
     if calendar_event:
+        for user in calendar_event.event_availability_slots:
+            for timeslot in calendar_event.event_availability_slots[user]:
+                booked_slots.append({
+                    "availability_slot": timeslot,
+                    "availability_owner": user
+               })
+
         return {
             "event_id": event_id,
             "event_title": calendar_event.event_title,
             "event_description": calendar_event.event_description,
             "availableTimeSlots": calendar_event.event_datetime_slots,
-            "booked_slots": [],
+            "booked_slots": booked_slots,
         }
     else:
         raise HTTPException(status_code=404, detail="Event not found")
@@ -41,30 +50,35 @@ def update_availability(
     availabilitySlot: AvailabilitySlotRequest,
     user_id: str = Depends(authenticated_uid_check),
 ):
-    event_obj = {
-        "event_id": availabilitySlot.event_id,
-        "availability_owner": user_id,
-        "availability_slot": availabilitySlot.event_availability_slot,
-    }
 
-    with engine.connect() as connection:
+    calendar_event = CalendarEvent.get(availabilitySlot.event_id)
+
+    if calendar_event:
+
+        event_obj = {
+            "event_id": availabilitySlot.event_id,
+            "availability_owner": user_id,
+            "availability_slot": availabilitySlot.event_availability_slot,
+        }
+
+
         if availabilitySlot.event_action == "TOGGLE":
-            ins = availabilityPDB.insert()
-            connection.execute(ins, event_obj)
+            if user_id not in calendar_event.event_availability_slots:
+                calendar_event.event_availability_slots[user_id] = []
+            calendar_event.event_availability_slots[user_id].append(availabilitySlot.event_availability_slot)
+        
+        
         elif availabilitySlot.event_action == "UNTOGGLE":
-            untoggle_sql_operation = (
-                delete(availabilityPDB)
-                .where(availabilityPDB.c.event_id == availabilitySlot.event_id)
-                .where(availabilityPDB.c.availability_owner == user_id)
-                .where(
-                    availabilityPDB.c.availability_slot
-                    == availabilitySlot.event_availability_slot
-                )
-            )
-            result = connection.execute(untoggle_sql_operation, event_obj)
-            if not result:
-                raise HTTPException(status_code=404, detail="Event not found")
+                if availabilitySlot.event_availability_slot in calendar_event.event_availability_slots[user_id]:
+                    calendar_event.event_availability_slots[user_id].remove(availabilitySlot.event_availability_slot)
+                else:
+                    raise HTTPException(status_code=404, detail="Slot has not been selected.")
+        
 
+    else:
+        raise HTTPException(status_code=404, detail="Event not found")
+
+    calendar_event.save()
     return event_obj
 
 
