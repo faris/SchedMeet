@@ -23,15 +23,13 @@ def get_events(event_id: str, user_id: str = Depends(authenticated_uid_check)):
 
     calendar_event = CalendarEvent.get(event_id)
     booked_slots = []
-    
-    
+
     if calendar_event:
         for user in calendar_event.event_availability_slots:
             for timeslot in calendar_event.event_availability_slots[user]:
-                booked_slots.append({
-                    "availability_slot": timeslot,
-                    "availability_owner": user
-               })
+                booked_slots.append(
+                    {"availability_slot": timeslot, "availability_owner": user}
+                )
 
         return {
             "event_id": event_id,
@@ -61,19 +59,25 @@ def update_availability(
             "availability_slot": availabilitySlot.event_availability_slot,
         }
 
-
         if availabilitySlot.event_action == "TOGGLE":
             if user_id not in calendar_event.event_availability_slots:
                 calendar_event.event_availability_slots[user_id] = []
-            calendar_event.event_availability_slots[user_id].append(availabilitySlot.event_availability_slot)
-        
-        
+            calendar_event.event_availability_slots[user_id].append(
+                availabilitySlot.event_availability_slot
+            )
+
         elif availabilitySlot.event_action == "UNTOGGLE":
-                if availabilitySlot.event_availability_slot in calendar_event.event_availability_slots[user_id]:
-                    calendar_event.event_availability_slots[user_id].remove(availabilitySlot.event_availability_slot)
-                else:
-                    raise HTTPException(status_code=404, detail="Slot has not been selected.")
-        
+            if (
+                availabilitySlot.event_availability_slot
+                in calendar_event.event_availability_slots[user_id]
+            ):
+                calendar_event.event_availability_slots[user_id].remove(
+                    availabilitySlot.event_availability_slot
+                )
+            else:
+                raise HTTPException(
+                    status_code=404, detail="Slot has not been selected."
+                )
 
     else:
         raise HTTPException(status_code=404, detail="Event not found")

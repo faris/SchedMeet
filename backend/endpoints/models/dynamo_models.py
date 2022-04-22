@@ -1,7 +1,9 @@
 from pynamodb.models import Model
 from pynamodb.indexes import GlobalSecondaryIndex, AllProjection
 from pynamodb.attributes import UnicodeAttribute, ListAttribute, MapAttribute
+
 # from pynamodb_attributes import UUIDAttribute
+
 
 class CalendarEvent(Model):
     class Meta:
