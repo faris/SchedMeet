@@ -6,7 +6,6 @@ import format from "date-fns/format";
 import ToggleButton from "@mui/material/ToggleButton";
 import enUS from "date-fns/locale/en-US";
 
-import { useCalendarStore } from "../stores/eventStore";
 import { useAuthStore } from "../stores/authStore";
 import { getEventInformation } from "../service/query";
 import { useAvailableSlotsStore } from "../stores/availabilityStore";
@@ -17,10 +16,15 @@ import { AvailabilityBookingAction } from "../constants";
 export const MyCalendar = () => {
   const { authToken, retrieveAuthToken, firebaseUser } = useAuthStore();
   const { event_id } = useParams();
-  const { setEventMetadata, eventMetadata } = useCalendarStore();
   const queryClient = useQueryClient();
 
-  const { generateGridMap, gridMap, toggleSlot } = useAvailableSlotsStore();
+  const {
+    generateGridMap,
+    gridMap,
+    toggleSlot,
+    setEventMetadata,
+    eventMetadata,
+  } = useAvailableSlotsStore();
 
   const updateAvailablitySlotMutation = useMutation(
     updateEventMutationFunction,

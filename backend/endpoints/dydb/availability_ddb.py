@@ -74,6 +74,10 @@ def update_availability(
                 calendar_event.event_availability_slots[user_id].remove(
                     availabilitySlot.event_availability_slot
                 )
+
+                if calendar_event.event_availability_slots[user_id] == []:
+                    calendar_event.event_availability_slots.pop(user_id)
+
             else:
                 raise HTTPException(
                     status_code=404, detail="Slot has not been selected."

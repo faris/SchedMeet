@@ -9,6 +9,8 @@ import { toggleActions } from "../constants";
 interface AvailabilityState {
   bookableDates: Array<Date>;
   gridMap: GridMap | null;
+  eventMetadata: { title: string; description: string };
+  setEventMetadata: (title: string, description: string) => void;
   generateGridMap: (
     availableDateTimeSlots: Array<string>,
     availableTimeSlots: Array<BookingResponse>,
@@ -19,6 +21,7 @@ interface AvailabilityState {
 
 export const useAvailableSlotsStore = create<AvailabilityState>(
   devtools((set, get) => ({
+    eventMetadata: { title: "", description: "" },
     bookableDates: [],
     gridMap: null,
     generateGridMap: (
@@ -42,6 +45,9 @@ export const useAvailableSlotsStore = create<AvailabilityState>(
       gridMap?.toggleSlot(xPos, yPos);
       set({ gridMap: gridMap });
       return actionDone;
+    },
+    setEventMetadata: (title: string, description: string) => {
+      set({ eventMetadata: { title: title, description: description } });
     },
   }))
 );

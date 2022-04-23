@@ -8,7 +8,10 @@ from pynamodb.attributes import UnicodeAttribute, ListAttribute, MapAttribute
 class CalendarEvent(Model):
     class Meta:
         table_name = "CalendarEvents"
-        region = "us-west-2"
+        region = "us-east-2"
+        read_capacity_units = 5
+        write_capacity_units = 5
+
 
     event_id = UnicodeAttribute(hash_key=True)
     event_owner = UnicodeAttribute()

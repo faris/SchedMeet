@@ -59,4 +59,4 @@ def read_root():
 
 metadata_object.create_all(engine, checkfirst=True)
 if not CalendarEvent.exists():
-    CalendarEvent.create_table(read_capacity_units=5, write_capacity_units=5, wait=True)
+    CalendarEvent.create_table(wait=True)
