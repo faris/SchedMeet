@@ -16,10 +16,6 @@ import {
   animals,
 } from "unique-names-generator";
 
-const config: Config = {
-  dictionaries: [adjectives, colors, animals],
-};
-
 const queryClient = new QueryClient();
 
 const firebaseConfig = {

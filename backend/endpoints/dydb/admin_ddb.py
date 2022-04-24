@@ -13,7 +13,7 @@ router = APIRouter()
 def create_event(
     new_event: NewEventRequest, user_id: str = Depends(authenticated_uid_check)
 ):
-    # TODO: Check if anything goes wrong here
+    
     event_id = str(uuid4())
 
     eventMetaDataObj = {
