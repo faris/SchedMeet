@@ -16,6 +16,11 @@ export interface AvailabilityBookingAction {
   action: toggleActions;
 }
 
+export interface EventsOwnedRow {
+  event_id: string;
+  event_title: string;
+}
+
 // This is the interface that represents slots that have been booked by a user
 export interface BookedTimeSlot {
   availability_id: string;

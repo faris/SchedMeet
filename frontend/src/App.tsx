@@ -3,10 +3,22 @@ import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";
 import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
 import { CreateNewEventPage } from "./Components/LoggedIn";
+import { HomePage } from "./Components/HomePage";
 import { useAuthStore } from "./stores/authStore";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { Routes, Route, Link } from "react-router-dom";
 import { MyCalendar } from "./Components/Calendar";
+import {
+  uniqueNamesGenerator,
+  Config,
+  adjectives,
+  colors,
+  animals,
+} from "unique-names-generator";
+
+const config: Config = {
+  dictionaries: [adjectives, colors, animals],
+};
 
 const queryClient = new QueryClient();
 
@@ -45,17 +57,28 @@ const uiConfig = {
 function App() {
   const [isSignedIn, setIsSignedIn] = useState(false); // Local signed-in state.
   const { setFireBaseUser } = useAuthStore();
+
   // Listen to the Firebase Auth state and set the local state.
   // Make sure we un-register Firebase observers when the component unmounts.
   useEffect(() => {
     const unregisterAuthObserver = firebase
       .auth()
       .onAuthStateChanged((user) => {
-        // TODO: maybe give identifiers to anonymous accounts.
+        // Here we give a deterministic pusedo anonymous name, to a user where the seed is the firebase token
         if (user?.isAnonymous && user?.displayName === null) {
+          const config: Config = {
+            dictionaries: [adjectives, colors, animals],
+            separator: "-",
+            seed: user.uid,
+          };
+
+          const psuedo_anon_name = uniqueNamesGenerator(config);
+
           user.updateProfile({
-            displayName: "Jane Q. User",
+            displayName: psuedo_anon_name,
           });
+
+          user.updateEmail(`${psuedo_anon_name}@anonperson.schedmeet.com`);
         }
 
         setIsSignedIn(!!user);
@@ -82,7 +105,8 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <Routes>
-        <Route path="/" element={<CreateNewEventPage />} />
+        <Route path="/" element={<HomePage />} />
+        <Route path="/create" element={<CreateNewEventPage />} />
         <Route path="/event/:event_id" element={<MyCalendar />} />
       </Routes>
     </QueryClientProvider>

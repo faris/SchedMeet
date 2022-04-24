@@ -41,6 +41,9 @@ def create_event(user_id: str = Depends(authenticated_uid_check)):
     owner_of_events = []
 
     for item in CalendarEvent.event_owner_index.query(user_id):
-        owner_of_events.append(item.event_id)
+        owner_of_events.append({
+            "event_id": item.event_id,
+            "event_title": item.event_title
+        })
     
     return {"events_owned": owner_of_events}

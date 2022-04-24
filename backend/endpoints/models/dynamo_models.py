@@ -12,7 +12,7 @@ class EventOwnerIndex(GlobalSecondaryIndex):
     class Meta:
         read_capacity_units = 2
         write_capacity_units = 1
-        projection = IncludeProjection(non_attr_keys=["event_owner"])
+        projection = IncludeProjection(non_attr_keys=["event_owner", "event_title"])
 
     # This attribute is the hash key for the index
     # Note that this attribute must also exist
