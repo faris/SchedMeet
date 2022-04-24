@@ -1,3 +1,4 @@
+from calendar import calendar
 from fastapi import APIRouter, Depends
 from uuid import uuid4
 from dependency import authenticated_uid_check
@@ -32,3 +33,14 @@ def create_event(
     )
     new_event.save()
     return eventMetaDataObj
+
+
+@router.get("/list")
+def create_event(user_id: str = Depends(authenticated_uid_check)):
+    
+    owner_of_events = []
+
+    for item in CalendarEvent.event_owner_index.query(user_id):
+        owner_of_events.append(item.event_id)
+    
+    return {"events_owned": owner_of_events}
