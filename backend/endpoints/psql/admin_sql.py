@@ -40,3 +40,29 @@ def create_event(
         connection.execute(eventToDateTable.insert(), event_date_time_slots)
 
     return eventMetaDataObj
+
+
+@router.get("/list")
+def create_event(user_id: str = Depends(authenticated_uid_check)):
+
+    owner_of_events = []
+
+    userManagementAvailableTimeSlotsQuery = (
+        select(
+            [
+                eventsPDB.c.event_id,
+                eventsPDB.c.event_title,
+            ]
+        )
+        .select_from(eventsPDB)
+        .where(eventsPDB.c.event_owner == user_id)
+    )
+    with engine.connect() as connection:
+        events_owned = connection.execute(
+            userManagementAvailableTimeSlotsQuery
+        ).fetchall()
+
+    for row in events_owned:
+        owner_of_events.append({"event_id": row[0], "event_title": row[1]})
+
+    return {"events_owned": owner_of_events}

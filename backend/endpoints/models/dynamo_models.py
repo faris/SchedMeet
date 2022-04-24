@@ -9,6 +9,7 @@ class EventOwnerIndex(GlobalSecondaryIndex):
     """
     This class represents a global secondary index
     """
+
     class Meta:
         read_capacity_units = 2
         write_capacity_units = 1

@@ -112,11 +112,18 @@ export const MyCalendar = () => {
                 ? {
                     background: gridMap.gridMap[x][y].userBooked
                       ? `rgb(12, 160, 44)`
-                      : `rgb(180, 180, 180)`,
+                      : `rgb(12, 200, 44, ${ratio / 1.2 + 0.1})`,
                     fontSize: ".8rem",
                     color: `rgb(0, 0, 0, ${ratio / 2 + 0.4})`,
                     width: `6rem`,
                     flex: `1 1 6rem`,
+
+                    borderColor: gridMap.gridMap[x][y].userBooked
+                      ? `black`
+                      : `thin`,
+                    borderWidth: gridMap.gridMap[x][y].userBooked
+                      ? `thick`
+                      : `thin`,
                   }
                 : {
                     background: `rgba(255,0,0,0.5)`,
