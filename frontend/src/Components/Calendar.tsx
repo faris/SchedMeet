@@ -12,6 +12,7 @@ import { useAvailableSlotsStore } from "../stores/availabilityStore";
 import { useQuery, useMutation, useQueryClient } from "react-query";
 import { updateEventMutationFunction } from "../service/mutation";
 import { AvailabilityBookingAction } from "../constants";
+import { RenderDivCell, RenderCellStyle } from "./utility/cellUtilities";
 
 export const MyCalendar = () => {
   const { authToken, retrieveAuthToken, firebaseUser } = useAuthStore();
@@ -97,42 +98,8 @@ export const MyCalendar = () => {
             xLabels={xLabels}
             yLabels={yLabels}
             // Reder cell with tooltip
-            cellRender={(x, y, value) => (
-              <div
-                style={{ outlineStyle: "dashed" }}
-                title={`(${x}, ${y}) = ${JSON.stringify(
-                  gridMap.gridMap[x][y]
-                )}`}
-              >
-                {gridMap.gridMap[x][y].bookableTime ? value : "unbookable"}
-              </div>
-            )}
-            cellStyle={(x, y, ratio) =>
-              gridMap.gridMap[x][y].bookableTime
-                ? {
-                    background: gridMap.gridMap[x][y].userBooked
-                      ? `rgb(12, 160, 44)`
-                      : `rgb(12, 200, 44, ${ratio / 1.2 + 0.1})`,
-                    fontSize: ".8rem",
-                    color: `rgb(0, 0, 0, ${ratio / 2 + 0.4})`,
-                    width: `6rem`,
-                    flex: `1 1 6rem`,
-
-                    borderColor: gridMap.gridMap[x][y].userBooked
-                      ? `black`
-                      : `thin`,
-                    borderWidth: gridMap.gridMap[x][y].userBooked
-                      ? `thick`
-                      : `thin`,
-                  }
-                : {
-                    background: `rgba(255,0,0,0.5)`,
-                    pointerEvents: `none`,
-                    fontSize: ".8rem",
-                    width: `6rem`,
-                    flex: `1 1 6rem`,
-                  }
-            }
+            cellRender={(x, y, value) => RenderDivCell(x, y, value, gridMap)}
+            cellStyle={(x, y, ratio) => RenderCellStyle(x, y, ratio, gridMap)}
             cellHeight="3rem"
             xLabelsPos="top"
             onClick={setGridToggle}
