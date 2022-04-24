@@ -1,12 +1,15 @@
 import create from "zustand";
-import { startOfDay, parseISO, compareAsc, format, parse } from "date-fns";
 import { devtools } from "zustand/middleware";
-import { GridMap, BookingResponse } from "../helpers/gridMap";
+import {
+  GridMap,
+  BookingResponse,
+  GridMapMetaDataSlot,
+} from "../helpers/gridMap";
 import { toggleActions } from "../constants";
 
 // TODO need to write tests for all these functions, because they are dependant on my logic......
 
-interface AvailabilityState {
+interface AvailabilityPageState {
   bookableDates: Array<Date>;
   gridMap: GridMap | null;
   eventMetadata: { title: string; description: string };
@@ -17,12 +20,15 @@ interface AvailabilityState {
     userID: string
   ) => void;
   toggleSlot: (xPos: number, yPos: number) => toggleActions;
+  infoPanelSlot: GridMapMetaDataSlot | null;
+  setInfoPanelSlot: (xPos: number, yPos: number) => void;
 }
 
-export const useAvailableSlotsStore = create<AvailabilityState>(
+export const useAvailabilityPageStore = create<AvailabilityPageState>(
   devtools((set, get) => ({
     eventMetadata: { title: "", description: "" },
     bookableDates: [],
+    infoPanelSlot: null,
     gridMap: null,
     generateGridMap: (
       availableDateTimeSlots: Array<string>,
@@ -48,6 +54,10 @@ export const useAvailableSlotsStore = create<AvailabilityState>(
     },
     setEventMetadata: (title: string, description: string) => {
       set({ eventMetadata: { title: title, description: description } });
+    },
+    setInfoPanelSlot: (xPos: number, yPos: number) => {
+      const gridMap = get().gridMap;
+      set({ infoPanelSlot: gridMap?.gridMap[xPos][yPos] || null });
     },
   }))
 );

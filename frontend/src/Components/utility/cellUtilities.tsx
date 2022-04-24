@@ -5,10 +5,11 @@ export const RenderDivCell = (
   x: number,
   y: number,
   value: number,
-  gridMap: GridMap
+  gridMap: GridMap,
+  setGridSlotFunc: any
 ) => {
   return (
-    <div title={`(${x}, ${y}) = ${JSON.stringify(gridMap.gridMap[x][y])}`}>
+    <div onMouseEnter={() => setGridSlotFunc(x, y)}>
       {gridMap.gridMap[x][y].bookableTime ? value : "unbookable"}
     </div>
   );

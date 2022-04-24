@@ -3,6 +3,28 @@
   margin-top: 3rem !important;
 }
 
+.availability-booking-page {
+  display: flex;
+}
+
 .meeting-grid {
   width: 60%;
+}
+
+.info-panel {
+  width: 40%;
+  display: grid;
+  grid-template-areas:
+    "a b c"
+    "d e f"
+    "g h i";
+}
+
+.info-panel-title {
+  grid-area: b;
+  align-self: start;
+}
+
+.info-panel-metadata {
+  grid-area: r;
 }

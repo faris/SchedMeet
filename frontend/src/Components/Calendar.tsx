@@ -3,12 +3,11 @@ import "../styles/calendar-overrides.css";
 import { useParams } from "react-router-dom";
 import { HeatMapGrid } from "react-grid-heatmap";
 import format from "date-fns/format";
-import ToggleButton from "@mui/material/ToggleButton";
-import enUS from "date-fns/locale/en-US";
+import { InfoPanel } from "../Components/utility/InfoPanel";
 
 import { useAuthStore } from "../stores/authStore";
 import { getEventInformation } from "../service/query";
-import { useAvailableSlotsStore } from "../stores/availabilityStore";
+import { useAvailabilityPageStore } from "../stores/availabilityStore";
 import { useQuery, useMutation, useQueryClient } from "react-query";
 import { updateEventMutationFunction } from "../service/mutation";
 import { AvailabilityBookingAction } from "../constants";
@@ -25,7 +24,9 @@ export const MyCalendar = () => {
     toggleSlot,
     setEventMetadata,
     eventMetadata,
-  } = useAvailableSlotsStore();
+    infoPanelSlot,
+    setInfoPanelSlot,
+  } = useAvailabilityPageStore();
 
   const updateAvailablitySlotMutation = useMutation(
     updateEventMutationFunction,
@@ -92,18 +93,23 @@ export const MyCalendar = () => {
       <>
         <h1>{eventMetadata.title}</h1>
         <p>{eventMetadata.description}</p>
-        <div className="meeting-grid">
-          <HeatMapGrid
-            data={gridMap.availableParticipantsMatrix}
-            xLabels={xLabels}
-            yLabels={yLabels}
-            // Reder cell with tooltip
-            cellRender={(x, y, value) => RenderDivCell(x, y, value, gridMap)}
-            cellStyle={(x, y, ratio) => RenderCellStyle(x, y, ratio, gridMap)}
-            cellHeight="3rem"
-            xLabelsPos="top"
-            onClick={setGridToggle}
-          />
+        <div className="availability-booking-page">
+          <div className="meeting-grid">
+            <HeatMapGrid
+              data={gridMap.availableParticipantsMatrix}
+              xLabels={xLabels}
+              yLabels={yLabels}
+              // Reder cell with tooltip
+              cellRender={(x, y, value) =>
+                RenderDivCell(x, y, value, gridMap, setInfoPanelSlot)
+              }
+              cellStyle={(x, y, ratio) => RenderCellStyle(x, y, ratio, gridMap)}
+              cellHeight="3rem"
+              xLabelsPos="top"
+              onClick={setGridToggle}
+            />
+          </div>
+          {InfoPanel(infoPanelSlot)}
         </div>
       </>
     );
