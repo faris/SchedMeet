@@ -1,5 +1,5 @@
 from firebase_admin import auth
-from pprint import pprint
+
 
 
 def get_users_info(array_of_firebase_uids):
@@ -13,7 +13,7 @@ def get_users_info(array_of_firebase_uids):
     results = auth.get_users(firebase_list_of_uids)
 
     for user in results.users:
-        print(vars(user))
+        
         firebase_list_of_users[user.uid] = {
               "user_id" : user.uid,
               "user_email": user.email,
