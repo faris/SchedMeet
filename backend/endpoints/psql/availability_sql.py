@@ -13,14 +13,14 @@ from ..models.relational_models import (
 from sqlalchemy.sql import select, update, delete
 from psycopg2.extras import DateTimeTZRange
 
-
+from ..helper.retreive_user_info import get_users_info 
 router = APIRouter()
 
 # Gets all info specific to an event_id, (what times a user can book, what times users put on the calendar)
 @router.get("/{event_id}")
 def get_events(event_id: str, user_id: str = Depends(authenticated_uid_check)):
 
-    title, description, availableTimeSlots, bookedSlots = None, None, [], []
+    title, description, availableTimeSlots, bookedSlots, listOfUsers = None, None, [], [], []
 
     with engine.connect() as connection:
         availableTimeSlotsJoinedTable = eventsPDB.join(
@@ -62,8 +62,20 @@ def get_events(event_id: str, user_id: str = Depends(authenticated_uid_check)):
         bookedTimeSlotsResult = connection.execute(bookedTimeSlotsQuery).fetchall()
 
     for row in bookedTimeSlotsResult:
-        bookedEvent = {"availability_owner": row[0], "availability_slot": row[1]}
+        listOfUsers.append(row[0])
+
+    users_info = get_users_info(listOfUsers)
+    
+    for row in bookedTimeSlotsResult:
+        user = row[0]
+        bookedEvent = {"availability_slot": row[1], "availability_owner": {
+                        "user_id": user,
+                        "user_name": users_info[user]["user_name"],
+                        "user_email": users_info[user]["user_email"]
+
+                    }}
         bookedSlots.append(bookedEvent)
+
 
     if availableTimeSlotsResult:
         return {
@@ -110,22 +122,3 @@ def update_availability(
     return event_obj
 
 
-# TODO: Get all events a user owns or is admin of.
-@router.get("/events/")
-def get_events(user_id: str = Depends(authenticated_uid_check)):
-    events = []
-
-    with engine.connect() as connection:
-        query = select(eventsPDB).where(eventsPDB.c.event_owner == user_id)
-        result = connection.execute(query).fetchall()
-
-        for row in result:
-            event_obj = {
-                "title": row.event_title,
-                "start": row.event_start_time,
-                "end": row.event_end_time,
-                "resource": {"event_id": row.event_id},
-            }
-            events.append(event_obj)
-
-    return events

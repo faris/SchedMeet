@@ -4,6 +4,8 @@ import datetime
 from fastapi import APIRouter, Depends, HTTPException
 from dependency import authenticated_uid_check
 from ..models.fast_api_models import AvailabilitySlotRequest
+from ..helper.retreive_user_info import get_users_info
+
 from ..models.relational_models import (
     eventsPDB,
     eventToDateTable,
@@ -13,7 +15,6 @@ from ..models.relational_models import (
 from sqlalchemy.sql import select, update, delete
 from psycopg2.extras import DateTimeTZRange
 from ..models.dynamo_models import CalendarEvent
-from ..helper.retreive_user_info import get_users_info 
 import logging
 
 router = APIRouter()
@@ -37,8 +38,8 @@ def get_events(event_id: str, user_id: str = Depends(authenticated_uid_check)):
                 booked_slots.append(
                     {"availability_slot": timeslot, "availability_owner": {
                         "user_id": user,
-                        "user_name": users_info[user]["user_name"],
-                        "user_email": users_info[user]["user_email"]
+                        "user_name": users_info[user].display_name,
+                        "user_email": users_info[user].email
 
                     }}
                 )
@@ -54,7 +55,6 @@ def get_events(event_id: str, user_id: str = Depends(authenticated_uid_check)):
         raise HTTPException(status_code=404, detail="Event not found")
 
 
-
 # Adds a new availability slot..
 @router.post("/update")
 def update_availability(
@@ -64,7 +64,10 @@ def update_availability(
 
     calendar_event = CalendarEvent.get(availabilitySlot.event_id)
 
+
     if calendar_event:
+
+        users_info = get_users_info(calendar_event.event_availability_slots.attribute_values.keys())
 
         event_obj = {
             "event_id": availabilitySlot.event_id,
@@ -73,11 +76,21 @@ def update_availability(
         }
 
         if availabilitySlot.event_action == "TOGGLE":
+            
             if user_id not in calendar_event.event_availability_slots:
                 calendar_event.event_availability_slots[user_id] = []
-            calendar_event.event_availability_slots[user_id].append(
-                availabilitySlot.event_availability_slot
-            )
+            
+            else:
+                calendar_event.event_availability_slots[user_id].append(
+
+                    {"availability_slot": availabilitySlot.event_availability_slot, "availability_owner": {
+                            "user_id": user_id,
+                            "user_name": users_info[user_id].display_name,
+                            "user_email": users_info[user_id].email
+
+                        }}
+                    
+                )
 
         elif availabilitySlot.event_action == "UNTOGGLE":
             if (

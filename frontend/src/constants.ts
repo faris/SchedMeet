@@ -21,13 +21,6 @@ export interface EventsOwnedRow {
   event_title: string;
 }
 
-// This is the interface that represents slots that have been booked by a user
-export interface BookedTimeSlot {
-  availability_id: string;
-  availability_owner: string;
-  availability_interval: [string, string];
-}
-
 export interface EventTimeRestrictions {
   noEarlierThenTime: Date;
   noLaterThenTime: Date;

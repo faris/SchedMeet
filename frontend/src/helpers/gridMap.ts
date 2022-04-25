@@ -5,14 +5,20 @@ interface GridAxis {
   timesAxis: Array<string>;
 }
 
+interface UserInfo {
+  user_id: string;
+  user_name: string;
+  user_email: string;
+}
+
 export interface BookingResponse {
   availability_slot: string;
-  availability_owner: string;
+  availability_owner: UserInfo;
 }
 
 export interface GridMapMetaDataSlot {
   position: [number, number];
-  participants: Set<string>;
+  participants: Set<UserInfo>;
   timeSlot: Date;
   userBooked: boolean;
   bookableTime: boolean;
@@ -107,7 +113,7 @@ export class GridMap {
       this.availableParticipantsMatrix[timeIndex][dateIndex] =
         this.availableParticipantsMatrix[timeIndex][dateIndex] + 1;
 
-      if (bookedAvailability.availability_owner == this.userID) {
+      if (bookedAvailability.availability_owner.user_id == this.userID) {
         this.gridMap[timeIndex][dateIndex].userBooked = true;
       }
     }
