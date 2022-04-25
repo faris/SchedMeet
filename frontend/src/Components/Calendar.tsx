@@ -84,8 +84,7 @@ export const MyCalendar = () => {
       onError: (response) => {
         navigate("/error");
       },
-      retry: false,
-
+      retry: 1,
       enabled: !!authToken && event_id !== undefined,
     }
   );
@@ -96,7 +95,6 @@ export const MyCalendar = () => {
     );
     const yLabels = gridMap.yAxis;
 
-    console.log(gridMap);
     return (
       <Container>
         <h1>{eventMetadata.title}</h1>

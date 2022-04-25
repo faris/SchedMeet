@@ -32,11 +32,6 @@ export const HomePage = () => {
       onSuccess: (response) => {
         setEventIDs(response.data.events_owned);
       },
-
-      onError: (response) => {
-        navigate("/404");
-      },
-      retry: false,
       enabled: !!authToken,
     }
   );
