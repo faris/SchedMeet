@@ -3,6 +3,7 @@ import firebase from "firebase/compat/app";
 import { useAuthStore } from "../stores/authStore";
 import { MyCalendar } from "./Calendar";
 import { SignupForm } from "./CreateEvent";
+import Container from "@mui/material/Container";
 
 export const CreateNewEventPage = () => {
   const { retrieveAuthToken, authToken, firebaseUser } = useAuthStore();
@@ -16,13 +17,13 @@ export const CreateNewEventPage = () => {
   }
 
   return (
-    <div>
+    <Container>
       <h1>My App</h1>
       <p>Welcome {firebaseUser?.displayName}! You are now signed-in!</p>
       {/* <p>Current Token: {authToken}</p> */}
       <p>Unique ID: {firebaseUser?.uid}</p>
       <SignupForm></SignupForm>
       <button onClick={() => firebase.auth().signOut()}>Sign-out</button>
-    </div>
+    </Container>
   );
 };

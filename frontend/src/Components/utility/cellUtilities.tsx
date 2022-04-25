@@ -9,8 +9,17 @@ export const RenderDivCell = (
   setGridSlotFunc: any
 ) => {
   return (
-    <div onMouseEnter={() => setGridSlotFunc(x, y)}>
-      {gridMap.gridMap[x][y].bookableTime ? value : "unbookable"}
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+      onMouseEnter={() => setGridSlotFunc(x, y)}
+    >
+      <span style={{ margin: "0" }}>
+        {gridMap.gridMap[x][y].bookableTime ? value : "unbookable"}
+      </span>
     </div>
   );
 };

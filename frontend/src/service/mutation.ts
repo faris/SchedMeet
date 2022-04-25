@@ -1,7 +1,7 @@
 import axios from "axios";
 
 import {
-  calendarPath,
+  baseURL,
   eventSQLPath,
   SchedMeetNewEventRequest,
   SchedMeetNewEventResponse,
@@ -12,13 +12,14 @@ import {
 export const createNewEventMutation = ({
   newEvent,
   authToken,
+  currentDataStore,
 }: {
   newEvent: SchedMeetNewEventRequest;
   authToken: string;
+  currentDataStore: string;
 }) => {
-  // TODO: timeRestrictions
   return axios.post<SchedMeetNewEventResponse>(
-    `${eventSQLPath}/new`,
+    `${baseURL}/${currentDataStore}/event/new`,
     {
       event_title: newEvent.title,
       event_description: newEvent.description,
@@ -35,12 +36,14 @@ export const createNewEventMutation = ({
 export const updateEventMutationFunction = ({
   newAvailabilityBooking,
   authToken,
+  currentDataStore,
 }: {
   newAvailabilityBooking: AvailabilityBookingAction;
   authToken: string;
+  currentDataStore: string;
 }) => {
   return axios.post<AvailabilityBookingAction>(
-    `${availabilitySQLPath}/update`,
+    `${baseURL}/${currentDataStore}/availability/update`,
     {
       event_id: newAvailabilityBooking.event_id,
       event_availability_slot: newAvailabilityBooking.time_slot,

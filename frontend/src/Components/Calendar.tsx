@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback } from "react";
 import "../styles/calendar-overrides.css";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { HeatMapGrid } from "react-grid-heatmap";
 import format from "date-fns/format";
 import { InfoPanel } from "../Components/utility/InfoPanel";
+import Container from "@mui/material/Container";
 
 import { useAuthStore } from "../stores/authStore";
 import { getEventInformation } from "../service/query";
@@ -14,9 +15,11 @@ import { AvailabilityBookingAction } from "../constants";
 import { RenderDivCell, RenderCellStyle } from "./utility/cellUtilities";
 
 export const MyCalendar = () => {
-  const { authToken, retrieveAuthToken, firebaseUser } = useAuthStore();
+  const { authToken, retrieveAuthToken, firebaseUser, currentDataStore } =
+    useAuthStore();
   const { event_id } = useParams();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const {
     generateGridMap,
@@ -56,6 +59,7 @@ export const MyCalendar = () => {
         updateAvailablitySlotMutation.mutate({
           newAvailabilityBooking,
           authToken,
+          currentDataStore,
         });
       }
     },
@@ -63,8 +67,8 @@ export const MyCalendar = () => {
   );
 
   useQuery(
-    ["fetchCalendarEvents", authToken],
-    () => getEventInformation(authToken, event_id || ""),
+    ["fetchCalendarEvents", authToken, currentDataStore],
+    () => getEventInformation(authToken, event_id || "", currentDataStore),
     {
       onSuccess: (response) => {
         generateGridMap(
@@ -77,6 +81,10 @@ export const MyCalendar = () => {
           response.data.event_description
         );
       },
+      onError: (response) => {
+        navigate("/error");
+      },
+      retry: false,
 
       enabled: !!authToken && event_id !== undefined,
     }
@@ -90,7 +98,7 @@ export const MyCalendar = () => {
 
     console.log(gridMap);
     return (
-      <>
+      <Container>
         <h1>{eventMetadata.title}</h1>
         <p>{eventMetadata.description}</p>
         <div className="availability-booking-page">
@@ -111,7 +119,7 @@ export const MyCalendar = () => {
           </div>
           {InfoPanel(infoPanelSlot)}
         </div>
-      </>
+      </Container>
     );
   }
   return <></>;

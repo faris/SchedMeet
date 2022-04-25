@@ -7,8 +7,6 @@ import {
 } from "../helpers/gridMap";
 import { toggleActions } from "../constants";
 
-// TODO need to write tests for all these functions, because they are dependant on my logic......
-
 interface AvailabilityPageState {
   bookableDates: Array<Date>;
   gridMap: GridMap | null;

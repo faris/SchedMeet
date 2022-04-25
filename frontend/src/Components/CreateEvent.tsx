@@ -223,7 +223,7 @@ export const TimeZonePicker = () => {
 };
 
 export const SignupForm = () => {
-  const { authToken, retrieveAuthToken } = useAuthStore();
+  const { authToken, retrieveAuthToken, currentDataStore } = useAuthStore();
   const { timeZone, restrictedTimeInterval, prepareInterval } =
     useNewEventFormStore();
 
@@ -263,7 +263,7 @@ export const SignupForm = () => {
             timeZone: values.timezone,
           };
 
-          createNewEvent.mutate({ newEvent, authToken });
+          createNewEvent.mutate({ newEvent, authToken, currentDataStore });
 
           setSubmitting(false);
         }}

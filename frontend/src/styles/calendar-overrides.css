@@ -1,10 +1,17 @@
 /* Super hacky, this aligns the y axis with the grid*/
-.meeting-grid > div:nth-child(1) > div:nth-child(1) {
+/* .meeting-grid > div:nth-child(1) > div:nth-child(1) {
   margin-top: 3rem !important;
+} */
+
+body,
+html {
+  font-family: "DM Sans", sans-serif;
+  margin: 0;
 }
 
 .availability-booking-page {
   display: flex;
+  position: relative;
 }
 
 .meeting-grid {
@@ -12,8 +19,17 @@
 }
 
 .info-panel {
+  margin-left: 24px;
+  padding: 16px;
+  background-color: lightblue;
+  border-radius: 8px;
+  position: sticky;
   width: 40%;
   display: grid;
+  height: 50%;
+  left: 0;
+  top: 24px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.25);
 }
 
 .info-panel-title {
@@ -23,4 +39,15 @@
 
 .info-panel-metadata {
   grid-area: r;
+}
+
+.info-label {
+  font-size: 12px;
+}
+
+.contents {
+  display: flex;
+  justify-content: space-between;
+  height: 48px;
+  align-items: center;
 }

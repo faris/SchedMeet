@@ -3,6 +3,7 @@ import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";
 import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
 import { CreateNewEventPage } from "./Components/LoggedIn";
+import { NavBar } from "./Components/NavBar";
 import { HomePage } from "./Components/HomePage";
 import { useAuthStore } from "./stores/authStore";
 import { QueryClient, QueryClientProvider } from "react-query";
@@ -15,6 +16,7 @@ import {
   colors,
   animals,
 } from "unique-names-generator";
+import { NotFoundPage } from "./Components/NotFoundPage";
 
 const queryClient = new QueryClient();
 
@@ -52,7 +54,12 @@ const uiConfig = {
 
 function App() {
   const [isSignedIn, setIsSignedIn] = useState(false); // Local signed-in state.
-  const { setFireBaseUser } = useAuthStore();
+  const {
+    setFireBaseUser,
+    firebaseUser,
+    currentDataStore,
+    setCurrentDataStore,
+  } = useAuthStore();
 
   // Listen to the Firebase Auth state and set the local state.
   // Make sure we un-register Firebase observers when the component unmounts.
@@ -100,11 +107,50 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/create" element={<CreateNewEventPage />} />
-        <Route path="/event/:event_id" element={<MyCalendar />} />
-      </Routes>
+      <>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <>
+                {NavBar(
+                  currentDataStore,
+                  setCurrentDataStore,
+                  firebaseUser?.displayName || ""
+                )}
+                <HomePage />
+              </>
+            }
+          />
+          <Route
+            path="/create"
+            element={
+              <>
+                {NavBar(
+                  currentDataStore,
+                  setCurrentDataStore,
+                  firebaseUser?.displayName || ""
+                )}
+                <CreateNewEventPage />
+              </>
+            }
+          />
+          <Route
+            path="/event/:event_id"
+            element={
+              <>
+                {NavBar(
+                  currentDataStore,
+                  setCurrentDataStore,
+                  firebaseUser?.displayName || ""
+                )}
+                <MyCalendar />
+              </>
+            }
+          />
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </>
     </QueryClientProvider>
   );
 }

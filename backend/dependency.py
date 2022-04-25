@@ -9,6 +9,7 @@ security = HTTPBearer()
 
 """
     Function that is used to validate the token in the case that it requires it
+    https://stackoverflow.com/questions/62994795/how-to-secure-fastapi-api-endpoint-with-jwt-token-based-authorization
 """
 
 

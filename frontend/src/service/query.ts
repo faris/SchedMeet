@@ -1,20 +1,17 @@
 import axios from "axios";
-import {
-  availabilitySQLPath,
-  EventsOwnedRow,
-  eventSQLPath,
-} from "../constants";
+import { baseURL, EventsOwnedRow, eventSQLPath } from "../constants";
 import { BookingResponse } from "../helpers/gridMap";
 export const getEventInformation = async (
   authToken: string,
-  event_id: string
+  event_id: string,
+  currentDataStore: string
 ) => {
   const result = await axios.get<{
     event_title: string;
     event_description: string;
     availableTimeSlots: Array<string>;
     booked_slots: Array<BookingResponse>;
-  }>(`${availabilitySQLPath}/${event_id}`, {
+  }>(`${baseURL}/${currentDataStore}/availability/${event_id}`, {
     headers: {
       Authorization: `Bearer ${authToken}`,
     },
@@ -23,10 +20,13 @@ export const getEventInformation = async (
   return result;
 };
 
-export const getUserEvents = async (authToken: string) => {
+export const getUserEvents = async (
+  authToken: string,
+  currentDataStore: string
+) => {
   const result = await axios.get<{
     events_owned: Array<EventsOwnedRow>;
-  }>(`${eventSQLPath}/list`, {
+  }>(`${baseURL}/${currentDataStore}/event/list`, {
     headers: {
       Authorization: `Bearer ${authToken}`,
     },

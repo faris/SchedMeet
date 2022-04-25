@@ -66,7 +66,7 @@ export const useNewEventFormStore = create<NewEventFormInterface>(
     },
 
     timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-    // TODO: Implement and remove granularity
+
     updateTimeZone: (timezone: string) => {
       set({
         timeZone: timezone,

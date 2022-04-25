@@ -13,7 +13,7 @@ from ..models.relational_models import (
 from sqlalchemy.sql import select, update, delete
 from psycopg2.extras import DateTimeTZRange
 from ..models.dynamo_models import CalendarEvent
-from ..helper.retreive_user_info import get_users_info 
+from ..helper.retreive_user_info import get_users_info
 import logging
 
 router = APIRouter()
@@ -23,24 +23,26 @@ router = APIRouter()
 def get_events(event_id: str, user_id: str = Depends(authenticated_uid_check)):
 
     calendar_event = CalendarEvent.get(event_id)
-    
 
     booked_slots = []
 
     if calendar_event:
 
-        users_info = get_users_info(calendar_event.event_availability_slots.attribute_values.keys())
-
+        users_info = get_users_info(
+            calendar_event.event_availability_slots.attribute_values.keys()
+        )
 
         for user in calendar_event.event_availability_slots:
             for timeslot in calendar_event.event_availability_slots[user]:
                 booked_slots.append(
-                    {"availability_slot": timeslot, "availability_owner": {
-                        "user_id": user,
-                        "user_name": users_info[user]["user_name"],
-                        "user_email": users_info[user]["user_email"]
-
-                    }}
+                    {
+                        "availability_slot": timeslot,
+                        "availability_owner": {
+                            "user_id": user,
+                            "user_name": users_info[user]["user_name"],
+                            "user_email": users_info[user]["user_email"],
+                        },
+                    }
                 )
 
         return {
@@ -52,7 +54,6 @@ def get_events(event_id: str, user_id: str = Depends(authenticated_uid_check)):
         }
     else:
         raise HTTPException(status_code=404, detail="Event not found")
-
 
 
 # Adds a new availability slot..
@@ -103,7 +104,7 @@ def update_availability(
     return event_obj
 
 
-# TODO: Get all events a user owns or is admin of.
+# Get all events a user owns or is admin of.
 @router.get("/events/")
 def get_events(user_id: str = Depends(authenticated_uid_check)):
     events = []

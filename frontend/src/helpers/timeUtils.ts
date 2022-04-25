@@ -39,7 +39,6 @@ const upgradeDateToDateTime = (time: Date, dateTime: Date) => {
   return addHours(addMinutes(time, minutes), hours);
 };
 
-// TODO: unit test
 export const generateAllTimeSlots = (
   date: Date,
   interval: [Date, Date],
