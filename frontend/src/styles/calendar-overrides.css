@@ -15,7 +15,6 @@ html {
 }
 
 .meeting-grid {
-  width: 60%;
 }
 
 .info-panel {
@@ -24,7 +23,6 @@ html {
   background-color: lightblue;
   border-radius: 8px;
   position: sticky;
-  width: 40%;
   display: grid;
   height: 50%;
   left: 0;

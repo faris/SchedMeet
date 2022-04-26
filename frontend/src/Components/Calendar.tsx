@@ -15,8 +15,13 @@ import { AvailabilityBookingAction } from "../constants";
 import { RenderDivCell, RenderCellStyle } from "./utility/cellUtilities";
 
 export const MyCalendar = () => {
-  const { authToken, retrieveAuthToken, firebaseUser, currentDataStore } =
-    useAuthStore();
+  const {
+    authToken,
+    retrieveAuthToken,
+    firebaseUser,
+    currentDataStore,
+    setCurrentDataStore,
+  } = useAuthStore();
   const { event_id } = useParams();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -84,7 +89,18 @@ export const MyCalendar = () => {
       onError: (response) => {
         navigate("/error");
       },
-      retry: 1,
+      // not the best approach, but basically there are times where a one-off error happens, as well as dealing with looking in both namespace at least twice.
+      retry: (failureCount, _) => {
+        console.log(failureCount);
+        if (failureCount % 2 == 1 && failureCount < 5) {
+          setCurrentDataStore("psql");
+          return true;
+        } else if (failureCount % 2 == 0 && failureCount < 5) {
+          setCurrentDataStore("dydb");
+          return true;
+        }
+        return false;
+      },
       enabled: !!authToken && event_id !== undefined,
     }
   );
